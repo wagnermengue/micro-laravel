@@ -18,7 +18,7 @@ class Category extends Model
         'is_active',
     ];
 
-    protected $date = [
+    protected $dates = [
         'deleted_at',
     ];
 
