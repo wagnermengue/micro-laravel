@@ -1,0 +1,2 @@
+CREATE DATABASE IF NOT EXISTS micro_videos_db;
+CREATE DATABASE IF NOT EXISTS micro_videos_db_test;
