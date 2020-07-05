@@ -98,4 +98,82 @@ class CategoryControllerTest extends TestCase
                 ])
             ]);
     }
+
+    public function testStore()
+    {
+        $response = $this->json('POST', route('categories.store'), [
+            'name' => 'test'
+        ]);
+        $id = $response->json('id');
+        $category = Category::find($id);
+
+        $response
+            ->assertStatus(201)
+            ->assertJson($category->toArray());
+        $this->assertTrue($response->json('is_active'));
+        $this->assertNull($response->json('description'));
+
+        $response = $this->json('POST', route('categories.store'), [
+            'name' => 'test',
+            'description' => 'test_description',
+            'is_active' => false
+        ]);
+
+        $response
+            ->assertJsonFragment([
+                'description' => 'test_description',
+                'is_active' => false,
+            ]);
+    }
+
+    public function testUpdate()
+    {
+        $category = factory(Category::class)->create([
+            'description' => 'test_description',
+            'is_active' => false,
+        ]);
+
+        $response = $this->json('PUT', route('categories.update', [
+            'category' => $category->id
+        ]), [
+            'name' => 'new_name',
+            'description' => 'new_description',
+            'is_active' => true,
+        ]);
+        $id = $response->json('id');
+        $category = Category::find($id);
+
+        $response
+            ->assertStatus(200)
+            ->assertJson($category->toArray())
+            ->assertJsonFragment([
+                'description' => 'new_description',
+                'is_active' => true,
+            ]);
+
+        $response = $this->json('PUT', route('categories.update', [
+            'category' => $category->id
+        ]), [
+            'name' => 'setNull',
+            'description' => '',
+        ]);
+
+        $response->assertJsonFragment([
+                'description' => null,
+        ]);
+
+        $category->description = 'toErase';
+        $category->save();
+
+        $response = $this->json('PUT', route('categories.update', [
+            'category' => $category->id
+        ]), [
+            'name' => 'setNull',
+            'description' => null,
+        ]);
+
+        $response->assertJsonFragment([
+            'description' => null,
+        ]);
+    }
 }
