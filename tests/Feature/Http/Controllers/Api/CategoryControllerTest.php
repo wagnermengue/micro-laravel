@@ -73,53 +73,29 @@ class CategoryControllerTest extends TestCase
 
     public function testUpdate()
     {
-        $category = factory(Category::class)->create([
+        $this->category = factory(Category::class)->create([
             'description' => 'test_description',
             'is_active' => false,
         ]);
-
-        $response = $this->json('PUT', route('categories.update', [
-            'category' => $category->id
-        ]), [
+        $data = [
             'name' => 'new_name',
             'description' => 'new_description',
             'is_active' => true,
-        ]);
-        $id = $response->json('id');
-        $category = Category::find($id);
+        ];
+        $response = $this->assertUpdate($data, $data + ['deleted_at' => null]);
+        $response->assertJsonStructure(['created_at', 'updated_at']);
 
-        $response
-            ->assertStatus(200)
-            ->assertJson($category->toArray())
-            ->assertJsonFragment([
-                'description' => 'new_description',
-                'is_active' => true,
-            ]);
-
-        $response = $this->json('PUT', route('categories.update', [
-            'category' => $category->id
-        ]), [
-            'name' => 'setNull',
+        $data = [
+            'name' => 'new_name',
             'description' => '',
-        ]);
+        ];
+        $this->assertUpdate($data, array_merge($data,  ['description' => null]));
 
-        $response->assertJsonFragment([
-            'description' => null,
-        ]);
+        $data['description'] = 'new';
+        $this->assertUpdate($data, array_merge($data,  ['description' => 'new']));
 
-        $category->description = 'toErase';
-        $category->save();
-
-        $response = $this->json('PUT', route('categories.update', [
-            'category' => $category->id
-        ]), [
-            'name' => 'setNull',
-            'description' => null,
-        ]);
-
-        $response->assertJsonFragment([
-            'description' => null,
-        ]);
+        $data['description'] = null;
+        $this->assertUpdate($data, array_merge($data,  ['description' => null]));
     }
 
     public function testDestroy()
