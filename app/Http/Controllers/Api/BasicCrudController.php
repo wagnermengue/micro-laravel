@@ -8,15 +8,16 @@ use Illuminate\Http\Request;
 abstract class BasicCrudController extends Controller
 {
     protected abstract function model();
-
-    private $rules = [
-        'name' => 'required|max:255',
-        'is_active' => 'boolean',
-    ];
+    protected abstract function rules();
 
     public function index()
     {
         return $this->model()::all();
+    }
+
+    public function store(Request $request)
+    {
+        $this->validate($request, $this->rules());
     }
 
 //    /**
