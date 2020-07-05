@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Tests\Traits;
-
 
 use Illuminate\Foundation\Testing\TestResponse;
 
