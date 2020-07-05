@@ -17,7 +17,7 @@ steps:
 
   - id: 'Copiando .env.testing'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', 'micro-videos-app', 'cp', '.env.example.testing', '.env']
+    args: ['exec', '-t', 'micro-videos-app', 'cp', '.env.testing.example', '.env']
 
   - id: 'Rodando key:generate'
     name: 'gcr.io/cloud-builders/docker'
