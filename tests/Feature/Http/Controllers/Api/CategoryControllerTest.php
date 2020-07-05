@@ -36,14 +36,14 @@ class CategoryControllerTest extends TestCase
 
     public function testInvalidateData()
     {
-        $response = $this->json('POST', route('categories.store'), []);
-        $this->assertInvalidationRequired($response);
+        $data = ['name' => ''];
+        $this->assertInvalidationInStoreAction($data, 'required');
 
-        $response = $this->json('POST', route('categories.store'), [
-            'name' => str_repeat('a', 256)
-        ]);
+        $data = ['name' => str_repeat('a', 256)];
+        $this->assertInvalidationInStoreAction($data, 'max.string', ['max' => 255]);
 
-        $this->assertInvalidationMax($response);
+        $data = ['is_active' => 'a'];
+        $this->assertInvalidationInStoreAction($data, 'boolean');
 
         $category = factory(Category::class)->create();
         $response = $this->json('PUT', route('categories.update', [
@@ -166,5 +166,10 @@ class CategoryControllerTest extends TestCase
         $response->assertStatus(204);
         $this->assertNull(Category::find($category->id));
         $this->assertNotNull(Category::withTrashed()->find($category->id));
+    }
+
+    public function routeStore()
+    {
+        return route('categories.store');
     }
 }
