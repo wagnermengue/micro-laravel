@@ -26,5 +26,6 @@ class CastMember extends Model
 
     protected $casts = [
         'id' => 'string',
+        'type' => 'integer',
     ];
 }

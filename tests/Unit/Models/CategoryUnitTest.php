@@ -2,17 +2,17 @@
 
 namespace Tests\Unit\Models;
 
-use App\Models\Genre;
+use App\Models\Category;
 use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PHPUnit\Framework\TestCase;
 
-class GenreTest extends TestCase
+class CategoryUnitTest extends TestCase
 {
     /**
-     * @var Genre
+     * @var Category
      */
-    private $genre;
+    private $category;
 
     public static function setUpBeforeClass(): void
     {
@@ -22,7 +22,7 @@ class GenreTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->genre = new Genre();
+        $this->category = new Category();
     }
 
     protected function tearDown(): void
@@ -38,8 +38,8 @@ class GenreTest extends TestCase
 
     public function testFillableAttribute()
     {
-        $fillable = ['name', 'is_active'];
-        $this->assertEquals($fillable, $this->genre->getFillable());
+        $fillable = ['name', 'description', 'is_active'];
+        $this->assertEquals($fillable, $this->category->getFillable());
     }
 
     public function testIfUseTraitsAttribute()
@@ -47,27 +47,27 @@ class GenreTest extends TestCase
         $traits = [
             SoftDeletes::class, Uuid::class
         ];
-        $genreTraits = array_keys(class_uses(Genre::class));
-        $this->assertEquals($traits, $genreTraits);
+        $categoryTraits = array_keys(class_uses(Category::class));
+        $this->assertEquals($traits, $categoryTraits);
     }
 
     public function testCastsAttribute()
     {
         $casts = ['id' => 'string', 'is_active' => 'boolean'];
-        $this->assertEquals($casts, $this->genre->getCasts());
+        $this->assertEquals($casts, $this->category->getCasts());
     }
 
     public function testIncrementingAttribute()
     {
-        $this->assertFalse($this->genre->incrementing);
+        $this->assertFalse($this->category->incrementing);
     }
 
     public function testDatesAttribute()
     {
         $dates = ['deleted_at', 'updated_at', 'created_at'];
         foreach ($dates as $date) {
-            $this->assertContains($date, $this->genre->getDates());
+            $this->assertContains($date, $this->category->getDates());
         }
-        $this->assertCount(count($dates), $this->genre->getDates());
+        $this->assertCount(count($dates), $this->category->getDates());
     }
 }
