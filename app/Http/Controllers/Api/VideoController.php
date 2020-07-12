@@ -19,8 +19,8 @@ class VideoController extends BasicCrudController
             'opened' => 'boolean',
             'rating' => 'required|in:' . implode(',', Video::RATING_LIST),
             'duration' => 'required|integer',
-            'categories_id' => 'required|array|exists:categories,id',
-            'genres_id' => 'required|array|exists:genres,id',
+            'categories_id' => 'required|array|exists:categories,id,deleted_at,NULL',
+            'genres_id' => 'required|array|exists:genres,id,deleted_at,NULL',
         ];
     }
 
@@ -49,18 +49,15 @@ class VideoController extends BasicCrudController
         /** @var Video $obj */
         $obj = \DB::transaction(function () use ($validatedData, $request, $self, $obj) {
             $obj->update($validatedData);
-            $self->handleRelations($obj, $request, 1);
+            $self->handleRelations($obj, $request);
             return $obj;
         });
 
         return $obj;
     }
 
-    protected function handleRelations(Video $video, Request $request, $d = null)
+    protected function handleRelations(Video $video, Request $request)
     {
-//        if($d)
-//            dd($request->toArray(), $video::with(['categories', 'genres'])->get()->toArray());
-
         $video->categories()->sync($request->get('categories_id'));
         $video->genres()->sync($request->get('genres_id'));
     }
