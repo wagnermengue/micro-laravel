@@ -35,10 +35,14 @@ class GenresHasCategoriesRule implements Rule
      */
     public function passes($attribute, $value)
     {
+        if (! is_array($value)) {
+            $value = [];
+        }
         $this->genresId = array_unique($value);
         if (! count($this->categoriesId) || ! count($this->genresId)) {
             return false;
         }
+
         $categoriesFounds = [];
         foreach ($this->genresId as $genreId) {
             $rows = $this->getRows($genreId);
@@ -47,6 +51,7 @@ class GenresHasCategoriesRule implements Rule
             }
             array_push($categoriesFounds, ...$rows->pluck('category_id')->toArray());
         }
+        $categoriesFounds = array_unique($categoriesFounds);
         if (count($categoriesFounds) !== count($this->categoriesId)) {
             return false;
         }

@@ -146,8 +146,9 @@ class VideoControllerTest extends TestCase
     public function testSave()
     {
         $category = factory(Category::class)->create();
+        /** @var Genre $genre */
         $genre = factory(Genre::class)->create();
-        //$genre->categories()->sync($category->id);
+        $genre->categories()->sync($category->id);
         $data = [
             [
                 'send_data' => $this->sendData + [
@@ -235,6 +236,9 @@ class VideoControllerTest extends TestCase
             ->andThrow(new TestException());
 
         $request = \Mockery::mock(Request::class);
+        $request->shouldReceive('get')
+            ->withAnyArgs()
+            ->andReturnNull();
 
         $hasError = false;
         try {
@@ -273,6 +277,9 @@ class VideoControllerTest extends TestCase
             ->andThrow(new TestException());
 
         $request = \Mockery::mock(Request::class);
+        $request->shouldReceive('get')
+            ->withAnyArgs()
+            ->andReturnNull();
 
         $hasError = false;
         try {
@@ -288,7 +295,7 @@ class VideoControllerTest extends TestCase
     {
         $categoriesId = factory(Category::class, 3)->create()->pluck('id')->toArray();
         $genre = factory(Genre::class)->create();
-        //$genre->categories()->sync($categoriesId);
+        $genre->categories()->sync($categoriesId);
         $response = $this->json(
             'POST',
             $this->routeStore(),
@@ -330,10 +337,10 @@ class VideoControllerTest extends TestCase
         $genresId = $genres->pluck('id')->toArray();
         $categoryId = factory(Category::class)->create()->id;
 
-//        /** @var Collection $genre */
-//        $genre->each(function ($genre) use ($categoryId) {
-//            $genre->categories()->sync($categoryId);
-//        });
+        /** @var Collection $genres */
+        $genres->each(function ($genres) use ($categoryId) {
+            $genres->categories()->sync($categoryId);
+        });
 
         $response = $this->json(
             'POST',
