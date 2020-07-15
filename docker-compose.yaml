@@ -28,7 +28,7 @@ services:
           - app
 
   db:
-      image: mysql:5.7
+      build: .docker/mysql
       command: --innodb-use-native-aio=0
       container_name: micro-videos-db
       restart: always
