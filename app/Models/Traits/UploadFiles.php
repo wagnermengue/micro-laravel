@@ -21,4 +21,20 @@ trait UploadFiles
     {
         $file->store($this->uploadDir());
     }
+
+    public function deleteFiles(array $files)
+    {
+        foreach ($files as $file) {
+            $this->deleteFile($file);
+        }
+    }
+
+    /**
+     * @param string|UploadedFile $file
+     */
+    public function deleteFile($file)
+    {
+        $fileName = $file instanceof UploadedFile ? $file->hashName() : $file;
+        \Storage::delete("{$this->uploadDir()}/{$fileName}");
+    }
 }
