@@ -37,4 +37,16 @@ trait UploadFiles
         $fileName = $file instanceof UploadedFile ? $file->hashName() : $file;
         \Storage::delete("{$this->uploadDir()}/{$fileName}");
     }
+
+    public static function extractFiles(array &$attributes = [])
+    {
+        $files = [];
+        foreach (self::$fileFields as $file) {
+            if (isset($attributes[$file]) && $attributes[$file] instanceof UploadedFile) {
+                $files[] = $attributes[$file];
+                $attributes[$file] = $attributes[$file]->hashName();
+            }
+        }
+        return $files;
+    }
 }
