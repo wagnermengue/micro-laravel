@@ -39,7 +39,7 @@ class Video extends Model
         'duration' => 'integer',
     ];
 
-    public static $fileFields = ['filme', 'banner', 'trailer'];
+    public static $fileFields = ['video_file'];
 
     public static function create(array $attributes = [])
     {
