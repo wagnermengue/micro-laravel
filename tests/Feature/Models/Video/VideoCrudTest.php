@@ -9,6 +9,15 @@ use Illuminate\Database\QueryException;
 
 class VideoCrudTest extends BaseVideoTestCase
 {
+    protected $fileFields = [];
+    protected function setUp(): void
+    {
+        parent::setUp();
+        foreach (Video::$fileFields as $field) {
+            $this->fileFields[$field] = "$field".'test_file_name';
+        }
+    }
+
     public function testList()
     {
         factory(Video::class, 1)->create();
@@ -24,6 +33,7 @@ class VideoCrudTest extends BaseVideoTestCase
             'duration',
             'year_launched',
             'video_file',
+            'thumb_file',
             'created_at',
             'updated_at',
             'deleted_at',
@@ -33,11 +43,12 @@ class VideoCrudTest extends BaseVideoTestCase
 
     public function testCreateBasic()
     {
-        $video = Video::create($this->data);
+
+        $video = Video::create($this->data + $this->fileFields);
         $video->refresh();
         $this->assertEquals(36, strlen($video->id));
         $this->assertFalse($video->opened);
-        $this->assertDatabaseHas('videos', $this->data + ['opened' => false]);
+        $this->assertDatabaseHas('videos', $this->data + $this->fileFields + ['opened' => false]);
 
         $video = Video::create($this->data + ['opened' => true]);
         $this->assertTrue($video->opened);
@@ -60,14 +71,14 @@ class VideoCrudTest extends BaseVideoTestCase
     public function testUpdateBasic()
     {
         $video = factory(Video::class)->create(['opened' => false]);
-        $video->update($this->data);
+        $video->update($this->data + $this->fileFields);
         $this->assertFalse($video->opened);
-        $this->assertDatabaseHas('videos', $this->data + ['opened' => false]);
+        $this->assertDatabaseHas('videos', $this->data + $this->fileFields + ['opened' => false]);
 
         $video = factory(Video::class)->create(['opened' => true]);
-        $video->update($this->data + ['opened' => true]);
+        $video->update($this->data + $this->fileFields + ['opened' => true]);
         $this->assertTrue($video->opened);
-        $this->assertDatabaseHas('videos', $this->data + ['opened' => true]);
+        $this->assertDatabaseHas('videos', $this->data + $this->fileFields + ['opened' => true]);
     }
 
     public function testUpdateWithRelations()
