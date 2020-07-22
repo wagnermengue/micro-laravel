@@ -73,8 +73,7 @@ class VideoUploadControllerTest extends BasicVideoControllerTestCase
         $response->assertStatus(200);
         $id = $response->json('id');
         foreach ($files as $file) {
-            //ver porque nao ta subindo o arquivo
-            //\Storage::assertExists("$id/{$file->hashName()}");
+            \Storage::assertExists("$id/{$file->hashName()}");
         }
     }
 
