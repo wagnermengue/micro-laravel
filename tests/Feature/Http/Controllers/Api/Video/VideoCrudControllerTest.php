@@ -1,45 +1,17 @@
 <?php
 
-namespace Tests\Feature\Http\Controllers\Api;
+namespace Tests\Feature\Http\Controllers\Api\Video;
 
-use App\Http\Controllers\Api\VideoController;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Video;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
-use Tests\Exceptions\TestException;
-use Tests\TestCase;
+use Illuminate\Http\UploadedFile;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
 
-class VideoControllerTest extends TestCase
+class VideoCrudControllerTest extends BasicVideoControllerTestCase
 {
-    use DatabaseMigrations, TestValidations, TestSaves;
-
-    /**
-     * @var \App\Models\Video
-     */
-    private $video;
-
-    private $sendData;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->video = factory(Video::class)->create([
-            'opened' => false
-        ]);
-        $this->sendData = [
-            'title' => 'title_test',
-            'description' => 'description_test',
-            'year_launched' => 2020,
-            'rating' => Video::RATING_LIST[0],
-            'duration' => 90,
-        ];
-    }
-
+    use TestValidations, TestSaves;
 
     public function testIndex()
     {
@@ -143,7 +115,7 @@ class VideoControllerTest extends TestCase
         $this->assertInvalidationInUpdateAction($data, 'exists');
     }
 
-    public function testSave()
+    public function testSaveWithoutFile()
     {
         $category = factory(Category::class)->create();
         /** @var Genre $genre */

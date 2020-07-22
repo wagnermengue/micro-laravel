@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Models;
+namespace Tests\Unit\Models\Traits;
 
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\TestCase;

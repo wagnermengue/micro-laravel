@@ -1,33 +1,14 @@
 <?php
 
-namespace Tests\Feature\Models;
+namespace Tests\Feature\Models\Video;
 
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Video;
 use Illuminate\Database\QueryException;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Tests\TestCase;
-use function Couchbase\fastlzCompress;
 
-class VideoTest extends TestCase
+class VideoCrudTest extends BaseVideoTestCase
 {
-    use DatabaseMigrations;
-
-    protected $data;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->data = [
-            'title' => 'title_test_data',
-            'description' => 'title_test_data',
-            'year_launched' => 2020,
-            'rating' => Video::RATING_LIST[0],
-            'duration' => 94
-        ];
-    }
-
     public function testList()
     {
         factory(Video::class, 1)->create();
@@ -42,6 +23,7 @@ class VideoTest extends TestCase
             'title',
             'duration',
             'year_launched',
+            'video_file',
             'created_at',
             'updated_at',
             'deleted_at',
