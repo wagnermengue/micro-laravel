@@ -7,7 +7,7 @@ steps:
       - GOOGLE_CLOUD_KEY_FILE=service-account-storage.json
       - GOOGLE_CLOUD_STORAGE_BUCKET=micro-video-storage
       - GOOGLE_CLOUD_STORAGE_API_URI=https://storage.cloud.google.com/micro-video-storage
-      - TESTING_PROD=true
+      - TESTING_PROD=false
 
   - id: 'Gerando key'
     name: 'gcr.io/cloud-builders/gcloud'
