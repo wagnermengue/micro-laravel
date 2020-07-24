@@ -1,14 +1,4 @@
 steps:
-  - id: 'Rodando docker compose'
-    name: 'gcr.io/$PROJECT_ID/docker-compose:1.25.5'
-    args: ['-f', 'docker-compose.prod.yaml', 'up', '-d']
-    env:
-      - GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID
-      - GOOGLE_CLOUD_KEY_FILE=service-account-storage.json
-      - GOOGLE_CLOUD_STORAGE_BUCKET=micro-video-storage
-      - GOOGLE_CLOUD_STORAGE_API_URI=https://storage.cloud.google.com/micro-video-storage
-      - TESTING_PROD=false
-
   - id: 'Gerando key'
     name: 'gcr.io/cloud-builders/gcloud'
     args:
@@ -19,6 +9,15 @@ steps:
       - --location=global
       - --keyring=course
       - --key=service-account
+
+  - id: 'Rodando docker compose'
+    name: 'gcr.io/$PROJECT_ID/docker-compose:1.25.5'
+    args: ['-f', 'docker-compose.prod.yaml', 'up', '-d']
+    env:
+      - GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID
+      - GOOGLE_CLOUD_KEY_FILE=service-account-storage.json
+      - GOOGLE_CLOUD_STORAGE_BUCKET=micro-video-storage
+      - GOOGLE_CLOUD_STORAGE_API_URI=https://storage.cloud.google.com/micro-video-storage
 
   - id: 'Rodando docker ps'
     name: 'gcr.io/cloud-builders/docker'
