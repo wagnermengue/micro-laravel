@@ -1,5 +1,6 @@
 steps:
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - id: 'Gerando key'
+    name: 'gcr.io/cloud-builders/gcloud'
     args:
       - kms
       - decrypt
