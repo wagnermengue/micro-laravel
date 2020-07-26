@@ -28,4 +28,14 @@ class CategoryControllerStub extends BasicCrudController
             'description' => 'nullable',
         ];
     }
+
+    protected function resourceCollection()
+    {
+        // TODO: Implement resourceCollection() method.
+    }
+
+    protected function resource()
+    {
+        // TODO: Implement resource() method.
+    }
 }

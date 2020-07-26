@@ -3,23 +3,45 @@
 namespace Tests\Feature\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\GenreController;
+use App\Http\Resources\GenreResource;
 use App\Models\Category;
 use App\Models\Genre;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Request;
 use Tests\Exceptions\TestException;
 use Tests\TestCase;
+use Tests\Traits\TestResources;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
 
 class GenreControllerTest extends TestCase
 {
-    use DatabaseMigrations, TestValidations, TestSaves;
+    use DatabaseMigrations, TestValidations, TestSaves, TestResources;
 
     /**
      * @var \App\Models\Genre
      */
     private $genre;
+
+    private $serializedFields = [
+        'id',
+        'name',
+        'is_active',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'categories' => [
+            '*' => [
+                'id',
+                'name',
+                'description',
+                'is_active',
+                'created_at',
+                'updated_at',
+                'deleted_at',
+            ]
+        ]
+    ];
 
     protected function setUp(): void
     {
@@ -33,7 +55,19 @@ class GenreControllerTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJson([$this->genre->toArray()]);
+            ->assertJson([
+                'meta' => ['per_page' => 15]
+            ])
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => $this->serializedFields
+                ],
+                'links' => [],
+                'meta' => [],
+            ]);
+
+        $resource = GenreResource::collection(collect([$this->genre]));
+        $this->assertResource($response, $resource);
     }
 
     public function testShow()
@@ -43,7 +77,10 @@ class GenreControllerTest extends TestCase
 
         $response
             ->assertStatus(200)
-            ->assertJson($genre->toArray());
+            ->assertJsonStructure(['data' => $this->serializedFields])
+            ->assertJsonFragment($genre->toArray());
+
+        $this->assertResource($response, new GenreResource($genre));
     }
 
     public function testInvalidateData()
@@ -80,15 +117,17 @@ class GenreControllerTest extends TestCase
         $categoryId = factory(Category::class)->create()->id;
         $data = ['name' => 'test'];
         $response = $this->assertStore($data + ['categories_id' => [$categoryId]], $data + ['is_active' => true]);
-        $response->assertJsonStructure(['created_at', 'updated_at']);
+        $response->assertJsonStructure(['data' => $this->serializedFields]);
 
-        $this->assertHasCategory($response->json('id'), $categoryId);
+        $this->assertHasCategory($response->json('data.id'), $categoryId);
 
         $data = [
             'name' => 'test',
             'is_active' => false
         ];
-        $this->assertStore($data + ['categories_id' => [$categoryId]], $data + ['is_active' => true]);
+        $response = $this->assertStore($data + ['categories_id' => [$categoryId]], $data + ['is_active' => true]);
+
+        $this->assertResource($response, new GenreResource(Genre::find($response->json('data.id'))));
     }
 
     public function testUpdate()
@@ -102,8 +141,10 @@ class GenreControllerTest extends TestCase
             'is_active' => true,
         ];
         $response = $this->assertUpdate($data + ['categories_id' => [$categoryId]], $data + ['deleted_at' => null]);
-        $response->assertJsonStructure(['created_at', 'updated_at']);
-        $this->assertHasCategory($response->json('id'), $categoryId);
+        $response->assertJsonStructure(['data' => $this->serializedFields]);
+        $this->assertHasCategory($response->json('data.id'), $categoryId);
+
+        $this->assertResource($response, new GenreResource(Genre::find($response->json('data.id'))));
     }
 
     protected function assertHasCategory($genreId, $categoryId)
@@ -195,7 +236,7 @@ class GenreControllerTest extends TestCase
         $response = $this->json('POST', $this->routeStore(), $sendData);
         $this->assertDatabaseHas('category_genre', [
             'category_id' => $categoriesId[0],
-            'genre_id' => $response->json('id'),
+            'genre_id' => $response->json('data.id'),
         ]);
 
         $sendData = [
@@ -204,20 +245,20 @@ class GenreControllerTest extends TestCase
         ];
         $response = $this->json(
             'PUT',
-            route('genres.update', ['genre' => $response->json('id')]),
+            route('genres.update', ['genre' => $response->json('data.id')]),
             $sendData
         );
         $this->assertDatabaseMissing('category_genre', [
             'category_id' => $categoriesId[0],
-            'genre_id' => $response->json('id'),
+            'genre_id' => $response->json('data.id'),
         ]);
         $this->assertDatabaseHas('category_genre', [
             'category_id' => $categoriesId[1],
-            'genre_id' => $response->json('id'),
+            'genre_id' => $response->json('data.id'),
         ]);
         $this->assertDatabaseHas('category_genre', [
             'category_id' => $categoriesId[2],
-            'genre_id' => $response->json('id'),
+            'genre_id' => $response->json('data.id'),
         ]);
     }
 
