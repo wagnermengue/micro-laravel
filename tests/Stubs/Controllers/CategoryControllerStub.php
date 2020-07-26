@@ -3,6 +3,7 @@
 namespace Tests\Stubs\Controllers;
 
 use App\Http\Controllers\Api\BasicCrudController;
+use App\Http\Resources\CategoryResource;
 use Tests\Stubs\Models\CategoryStub;
 
 class CategoryControllerStub extends BasicCrudController
@@ -31,11 +32,11 @@ class CategoryControllerStub extends BasicCrudController
 
     protected function resourceCollection()
     {
-        // TODO: Implement resourceCollection() method.
+        return $this->resource();
     }
 
     protected function resource()
     {
-        // TODO: Implement resource() method.
+        return CategoryResource::class;
     }
 }
