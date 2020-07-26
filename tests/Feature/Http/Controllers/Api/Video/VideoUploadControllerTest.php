@@ -66,6 +66,8 @@ class VideoUploadControllerTest extends BasicVideoControllerTestCase
 
         $response->assertStatus(201);
         $this->assertFilesOnPersist($response, $files);
+        $video = Video::find($response->json('data.id'));
+        $this->assertIfFilesUrlsExists($video, $response);
     }
 
     public function testUpdateWithFile()
@@ -81,6 +83,8 @@ class VideoUploadControllerTest extends BasicVideoControllerTestCase
 
         $response->assertStatus(200);
         $this->assertFilesOnPersist($response, $files);
+        $video = Video::find($response->json('data.id'));
+        $this->assertIfFilesUrlsExists($video, $response);
 
         $newFiles = [
             'thumb_file' => UploadedFile::fake()->create('tb_file.jpg'),
@@ -95,9 +99,9 @@ class VideoUploadControllerTest extends BasicVideoControllerTestCase
 
         $response->assertStatus(200);
         $this->assertFilesOnPersist($response, Arr::except($files, ['thumb_file', 'video_file']) + $newFiles);
+        $video = Video::find($response->json('data.id'));
+        $this->assertIfFilesUrlsExists($video, $response);
 
-        $id = $response->json('data.id');
-        $video = Video::find($id);
         \Storage::assertMissing($video->relativeFilePath($files['thumb_file']->hashName()));
         \Storage::assertMissing($video->relativeFilePath($files['video_file']->hashName()));
     }

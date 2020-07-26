@@ -50,16 +50,12 @@ abstract class BasicVideoControllerTestCase extends TestCase
 
         foreach ($fileFields as $field) {
             $file = $video->{$field};
-            // ajustado com if, pois está sempre retornando
-            // a url completa do storage e comparando com null
             if ($file) {
                 $this->assertEquals(
                     \Storage::url($video->relativeFilePath($file)),
                     $data[$field . "_url"]
                 );
             }
-            // implementei esse assert para validar que quando não
-            // o valor da resposta json das urls tambem sejam null
             if (! $file) {
                 $this->assertNull($data[$field . "_url"]);
             }
