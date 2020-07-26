@@ -20,6 +20,11 @@ class UploadFileTest extends TestCase
         UploadFileStub::makeTable();
     }
 
+    public function testRelativeFilePath()
+    {
+        $this->assertEquals("1/video.mp4", $this->obj->relativeFilePath("video.mp4"));
+    }
+
     public function testMakeOldFilesOnSaving()
     {
         $this->obj->fill([
