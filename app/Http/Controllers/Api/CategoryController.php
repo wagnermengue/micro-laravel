@@ -28,6 +28,11 @@ class CategoryController extends BasicCrudController
         return $this->rules;
     }
 
+    protected function resourceCollection()
+    {
+        return $this->resource();
+    }
+
     protected function resource()
     {
         return CategoryResource::class;
