@@ -25,15 +25,15 @@ steps:
 
   - id: 'Rodando compose'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', '/var/www/backend/composer', 'install']
+    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', './backend/composer', 'install']
 
   - id: 'Copiando .env'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', 'cp', '/var/www/backend/.env.example', '/var/www/backend/.env']
+    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', 'cp', './backend/.env.example', './backend/.env']
 
   - id: 'Copiando .env.testing'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', 'cp', '/var/www/backend/.env.testing.example', '/var/www/backend/.env']
+    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', 'cp', './backend/.env.testing.example', './backend/.env']
 
   - id: 'Rodando key:generate'
     name: 'gcr.io/cloud-builders/docker'
