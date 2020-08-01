@@ -2,6 +2,11 @@
 
 #On error no such file entrypoint.sh, execute in terminal - dos2unix .docker\entrypoint.sh
 
+### front-end
+npm config set cache /var/www/.npm-cache --global
+cd /var/www/frontend && npm install && cd ..
+
+### back-end
 # deixei comentado os ifs pois estao com problema
 cd backend
 #if [ ! -f ".env"]; then
