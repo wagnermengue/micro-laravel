@@ -2,19 +2,22 @@ import {RouteProps} from "react-router-dom";
 import Dashboard from "../pages/Dashboard";
 import List from "../pages/category/List";
 
-interface MYRouteProps extends RouteProps
+export interface MYRouteProps extends RouteProps
 {
+    name: string,
     label: string
 }
 
 const routes = [
     {
+        name: 'dashboard',
         label: "Dashboard",
         path: "/",
         component: Dashboard,
         exact: true
     },
     {
+        name: 'categories.list',
         label: "Listar categorias",
         path: "/categorias",
         component: List,
