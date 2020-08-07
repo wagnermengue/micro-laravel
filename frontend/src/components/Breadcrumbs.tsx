@@ -1,5 +1,5 @@
 import React from 'react';
-import {makeStyles, Theme, createStyles, Container} from '@material-ui/core';
+import {makeStyles, Theme, createStyles, Container, Box} from '@material-ui/core';
 import Link, {LinkProps} from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
 import MuiBreadcrumbs from '@material-ui/core/Breadcrumbs';
@@ -66,11 +66,13 @@ export default function Breadcrumbs() {
 
     return (
         <Container>
-            <Route>
-                {
-                    ({location}) => makeBreadcrumb(location)
-                }
-            </Route>
+            <Box paddingBottom={2}>
+                <Route>
+                    {
+                        ({location}) => makeBreadcrumb(location)
+                    }
+                </Route>
+            </Box>
         </Container>
     );
 }
