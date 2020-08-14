@@ -39,17 +39,22 @@ const data = [
     {name: "teste4", is_active: true, created_at: "2019-03-02"}
 ];
 
+interface Category{
+    id: string;
+    name: string;
+}
+
 type Props = {
 
 };
 const Table = (props: Props) => {
 
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<Category[]>([]);
 
     //component did mount
     useEffect(() => {
         categoryHttp
-            .list()
+            .list<{data: Category[]}>()
             .then(({data}) => setData(data.data))
         // httpVideo.get('categories').then(
         //     response => setData(response.data.data)
