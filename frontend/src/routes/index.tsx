@@ -4,6 +4,8 @@ import CategoryList from "../pages/category/PageList";
 import CastMembersList from "../pages/cast-member/PageList";
 import GenreList from "../pages/genre/PageList";
 import CategoryForm from "../pages/category/PageForm";
+import CastMembersForm from "../pages/cast-member/PageForm";
+import GenreForm from "../pages/genre/PageForm";
 
 export interface MYRouteProps extends RouteProps
 {
@@ -44,7 +46,7 @@ const routes = [
         name: 'cast_members.create',
         label: "Criar membros de elencos",
         path: "/cast-members/create",
-        component: CastMembersList,
+        component: CastMembersForm,
         exact: true
     },
     {
@@ -58,7 +60,7 @@ const routes = [
         name: 'genre.create',
         label: "Criar gênero",
         path: "/genres/create",
-        component: GenreList,
+        component: GenreForm,
         exact: true
     }
 ];
