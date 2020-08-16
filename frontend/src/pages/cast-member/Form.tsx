@@ -33,10 +33,9 @@ export const Form = () => {
 
     const {register, handleSubmit, getValues, setValue} = useForm();
 
-    //comentado pq ta falhando no build
-    // useEffect(() => {
-    //     register({name: "type"})
-    // }, [register]);
+    useEffect(() => {
+        register({name: "type"})
+    }, [register]);
 
     function onSubmit(formData, event) {
         castMemberHttp
