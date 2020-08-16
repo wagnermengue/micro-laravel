@@ -5,6 +5,7 @@ import categoryHttp from "../../util/http/category-http";
 import * as yup from '../../util/vendor/yup';
 import {useParams, useHistory} from 'react-router';
 import {useEffect, useState} from "react";
+import {useSnackbar} from "notistack";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -29,6 +30,7 @@ export const Form = () => {
         }
     });
 
+    const snackbar = useSnackbar();
     const history = useHistory();
     const {id} = useParams();
     const [category, setCategories] = useState<{ id: string }>();
@@ -66,15 +68,24 @@ export const Form = () => {
             : categoryHttp.update(category.id, formData)
         http
             .then(({data}) => {
+                snackbar.enqueueSnackbar(
+                    'Categoria cadastrada com sucesso!',
+                    {variant: "success"});
                 setTimeout(() => {
-                    event ?
-                        (
+                    event
+                        ? (
                             id
-                                ? history.replace("/categories/${data.data.id}/edit")
-                                : history.push("/categories/${data.data.id}/edit")
-                        ) :
-                        history.push("/categories/")
-                })
+                                ? history.replace(`/categories/${data.data.id}/edit`)
+                                : history.push(`/categories/${data.data.id}/edit`)
+                                ) :
+                                history.push("/categories/")
+                });
+            })
+            .catch((error) => {
+                console.log(error);
+                snackbar.enqueueSnackbar(
+                    'Falha ao cadastrar categoria',
+                    {variant: "error"})
             })
             .finally(() => setLoading(false));
     }
