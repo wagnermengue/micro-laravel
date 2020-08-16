@@ -1,10 +1,11 @@
 import * as React from 'react';
-import {Box, Button, Checkbox, ButtonProps, makeStyles, TextField, Theme} from "@material-ui/core";
+import {Box, Button, Checkbox, ButtonProps, makeStyles, TextField, Theme, FormControlLabel} from "@material-ui/core";
 import {useForm} from "react-hook-form";
 import categoryHttp from "../../util/http/category-http";
 import * as yup from '../../util/vendor/yup';
 import {useParams} from 'react-router';
 import {useEffect, useState} from "react";
+import {watch} from "fs";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -28,7 +29,7 @@ export const Form = () => {
         variant: "contained"
     }
 
-    const {register, handleSubmit, getValues, errors, reset} = useForm({
+    const {register, handleSubmit, getValues, setValue, errors, reset, watch} = useForm({
         // validationSchema,
         defaultValues: {
             is_active: true
@@ -37,6 +38,10 @@ export const Form = () => {
 
     const {id} = useParams();
     const [category, setCategories] = useState<{id: string}>();
+
+    useEffect(() => {
+        register({name: "is_active"})
+    }, [register]);
 
     useEffect(() => {
         if (!id) {
@@ -81,11 +86,17 @@ export const Form = () => {
                 inputRef={register}
                 InputLabelProps={{shrink: true}}
             />
-            <Checkbox
-                name="is_active"
-                inputRef={register}
-                defaultChecked
-            /> Ativo?
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        name="is_active"
+                        onChange={ () => setValue('is_active', !getValues()['is_active'])}
+                        checked={watch('is_active')}
+                    />
+                }
+                label={'Ativo?'}
+                labelPlacement={'end'}
+            />
             <Box dir={"rtl"}>
                 <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
                 <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
