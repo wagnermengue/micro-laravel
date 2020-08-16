@@ -5,7 +5,6 @@ import categoryHttp from "../../util/http/category-http";
 import * as yup from '../../util/vendor/yup';
 import {useParams} from 'react-router';
 import {useEffect, useState} from "react";
-import {watch} from "fs";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -23,12 +22,6 @@ export const Form = () => {
 
     const classes = useStyles();
 
-    const buttonProps: ButtonProps = {
-        className: classes.submit,
-        color: 'secondary',
-        variant: "contained"
-    }
-
     const {register, handleSubmit, getValues, setValue, errors, reset, watch} = useForm({
         // validationSchema,
         defaultValues: {
@@ -38,6 +31,14 @@ export const Form = () => {
 
     const {id} = useParams();
     const [category, setCategories] = useState<{id: string}>();
+    const [loading, setLoading] = useState<boolean>(false);
+
+    const buttonProps: ButtonProps = {
+        className: classes.submit,
+        color: 'secondary',
+        variant: "contained",
+        disabled: loading
+    }
 
     useEffect(() => {
         register({name: "is_active"})
@@ -47,19 +48,24 @@ export const Form = () => {
         if (!id) {
             return
         }
+        setLoading(true);
         categoryHttp
             .get(id)
             .then(({data}) => {
                 setCategories(data.data)
                 reset(data.data)
-            });
+            })
+            .finally(() => setLoading(false));
     }, []);
 
     function onSubmit(formData, event) {
+        setLoading(true);
         const http = !category
             ? categoryHttp.create(formData)
             : categoryHttp.update(category.id, formData)
-        http.then((response) => console.log(response));
+        http
+            .then((response) => console.log(response))
+            .finally(() => setLoading(false));
     }
 
     return (
@@ -71,6 +77,7 @@ export const Form = () => {
                 variant={"outlined"}
                 margin={"normal"}
                 inputRef={register}
+                disabled={loading}
                 InputLabelProps={{shrink: true}}
                 // error={errors.name !== undefined}
                 // helperText={errors.name && errors.name.message}
@@ -84,6 +91,7 @@ export const Form = () => {
                 variant={"outlined"}
                 margin={"normal"}
                 inputRef={register}
+                disabled={loading}
                 InputLabelProps={{shrink: true}}
             />
             <FormControlLabel
@@ -96,6 +104,7 @@ export const Form = () => {
                 }
                 label={'Ativo?'}
                 labelPlacement={'end'}
+                disabled={loading}
             />
             <Box dir={"rtl"}>
                 <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
