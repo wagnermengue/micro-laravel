@@ -3,6 +3,8 @@ import {Box, Button, Checkbox, ButtonProps, makeStyles, TextField, Theme} from "
 import {useForm} from "react-hook-form";
 import categoryHttp from "../../util/http/category-http";
 import * as yup from '../../util/vendor/yup';
+import {useParams} from 'react-router';
+import {useEffect, useState} from "react";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -20,23 +22,39 @@ export const Form = () => {
 
     const classes = useStyles();
 
-    const buttonProps : ButtonProps = {
+    const buttonProps: ButtonProps = {
         className: classes.submit,
         color: 'secondary',
         variant: "contained"
     }
 
-    const {register, handleSubmit, getValues, errors} = useForm({
+    const {register, handleSubmit, getValues, errors, reset} = useForm({
         // validationSchema,
         defaultValues: {
             is_active: true
         }
     });
 
-    function onSubmit(formData, event) {
+    const {id} = useParams();
+    const [category, setCategories] = useState<{id: string}>();
+
+    useEffect(() => {
+        if (!id) {
+            return
+        }
         categoryHttp
-            .create(formData)
-            .then((response) => console.log(response));
+            .get(id)
+            .then(({data}) => {
+                setCategories(data.data)
+                reset(data.data)
+            });
+    }, []);
+
+    function onSubmit(formData, event) {
+        const http = !category
+            ? categoryHttp.create(formData)
+            : categoryHttp.update(category.id, formData)
+        http.then((response) => console.log(response));
     }
 
     return (
@@ -48,6 +66,7 @@ export const Form = () => {
                 variant={"outlined"}
                 margin={"normal"}
                 inputRef={register}
+                InputLabelProps={{shrink: true}}
                 // error={errors.name !== undefined}
                 // helperText={errors.name && errors.name.message}
             />
@@ -60,6 +79,7 @@ export const Form = () => {
                 variant={"outlined"}
                 margin={"normal"}
                 inputRef={register}
+                InputLabelProps={{shrink: true}}
             />
             <Checkbox
                 name="is_active"
