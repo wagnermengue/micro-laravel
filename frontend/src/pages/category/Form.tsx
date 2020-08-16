@@ -3,7 +3,7 @@ import {Box, Button, Checkbox, ButtonProps, makeStyles, TextField, Theme, FormCo
 import {useForm} from "react-hook-form";
 import categoryHttp from "../../util/http/category-http";
 import * as yup from '../../util/vendor/yup';
-import {useParams} from 'react-router';
+import {useParams, useHistory} from 'react-router';
 import {useEffect, useState} from "react";
 
 const useStyles = makeStyles((theme: Theme) => {
@@ -29,8 +29,9 @@ export const Form = () => {
         }
     });
 
+    const history = useHistory();
     const {id} = useParams();
-    const [category, setCategories] = useState<{id: string}>();
+    const [category, setCategories] = useState<{ id: string }>();
     const [loading, setLoading] = useState<boolean>(false);
 
     const buttonProps: ButtonProps = {
@@ -64,7 +65,17 @@ export const Form = () => {
             ? categoryHttp.create(formData)
             : categoryHttp.update(category.id, formData)
         http
-            .then((response) => console.log(response))
+            .then(({data}) => {
+                setTimeout(() => {
+                    event ?
+                        (
+                            id
+                                ? history.replace("/categories/${data.data.id}/edit")
+                                : history.push("/categories/${data.data.id}/edit")
+                        ) :
+                        history.push("/categories/")
+                })
+            })
             .finally(() => setLoading(false));
     }
 
@@ -98,7 +109,7 @@ export const Form = () => {
                 control={
                     <Checkbox
                         name="is_active"
-                        onChange={ () => setValue('is_active', !getValues()['is_active'])}
+                        onChange={() => setValue('is_active', !getValues()['is_active'])}
                         checked={watch('is_active')}
                     />
                 }
