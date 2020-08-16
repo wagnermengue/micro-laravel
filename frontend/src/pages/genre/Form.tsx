@@ -19,7 +19,8 @@ export const Form = () => {
 
     const buttonProps : ButtonProps = {
         className: classes.submit,
-        variant: "outlined"
+        color: 'secondary',
+        variant: "contained"
     }
 
     const [categories, setCategories] = useState<any[]>([]);
@@ -86,6 +87,7 @@ export const Form = () => {
             <Checkbox
                 name="is_active"
                 inputRef={register}
+                defaultChecked
             /> Ativo?
             <Box dir={"rtl"}>
                 <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
