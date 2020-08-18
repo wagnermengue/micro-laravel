@@ -25,7 +25,7 @@ steps:
 
   - id: 'Rodando compose'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', './backend/composer', 'install']
+    args: ['exec', '-t', '-u' ,'root', '-w', '/var/www/backend','micro-videos-app', 'composer', 'install']
 
   - id: 'Copiando .env'
     name: 'gcr.io/cloud-builders/docker'
