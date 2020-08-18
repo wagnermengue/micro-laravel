@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {Box, Button, Checkbox, ButtonProps, makeStyles, TextField, Theme, FormControlLabel} from "@material-ui/core";
 import {useForm} from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers';
 import categoryHttp from "../../util/http/category-http";
 import * as yup from '../../util/vendor/yup';
 import {useParams, useHistory} from 'react-router';
@@ -23,8 +24,8 @@ export const Form = () => {
 
     const classes = useStyles();
 
-    const {register, handleSubmit, getValues, setValue, errors, reset, watch} = useForm({
-        // validationSchema,
+    const {register, handleSubmit, getValues, setValue, errors, reset, watch} = useForm<any>({
+        resolver: yupResolver(validationSchema),
         defaultValues: {
             is_active: true
         }
@@ -101,8 +102,8 @@ export const Form = () => {
                 inputRef={register}
                 disabled={loading}
                 InputLabelProps={{shrink: true}}
-                // error={errors.name !== undefined}
-                // helperText={errors.name && errors.name.message}
+                error={errors.name !== undefined}
+                helperText={errors.name && errors.name.message}
             />
             <TextField
                 name="description"
