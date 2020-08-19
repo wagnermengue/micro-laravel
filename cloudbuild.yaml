@@ -19,6 +19,10 @@ steps:
       - GOOGLE_CLOUD_STORAGE_BUCKET=micro-video-storage
       - GOOGLE_CLOUD_STORAGE_API_URI=https://storage.cloud.google.com/micro-video-storage
 
+  - id: "Chown in /var/www"
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['exec','-t','-u','root','micro-videos-app','chown','-R','www-data:www-data','/var/www']
+
   - id: 'Rodando docker ps'
     name: 'gcr.io/cloud-builders/docker'
     args: ['ps']
