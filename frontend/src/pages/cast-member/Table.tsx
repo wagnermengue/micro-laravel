@@ -43,10 +43,17 @@ const Table = (props: Props) => {
 
     //component did mount
     useEffect(() => {
-        (async function getCastMembers() {
+        let isSubscribed = true;
+        (async () => {
             const {data} = await httpVideo.get('cast_members');
-            setData(data.data);
+            if(isSubscribed) {
+                setData(data.data);
+            }
         })();
+
+        return () => {
+            isSubscribed = false;
+        }
     }, []);
 
     return (

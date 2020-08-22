@@ -53,10 +53,17 @@ const Table = (props: Props) => {
 
     //component did mount
     useEffect(() => {
-        (async function getCategories() {
+        let isSubscribed = true;
+        (async () => {
             const {data} = await categoryHttp.list<{data: Category[]}>();
-            setData(data.data);
+            if(isSubscribed) {
+                setData(data.data);
+            }
         })();
+
+        return () => {
+            isSubscribed = false;
+        }
         // categoryHttp
         //     .list<{data: Category[]}>()
         //     .then(({data}) => setData(data.data))

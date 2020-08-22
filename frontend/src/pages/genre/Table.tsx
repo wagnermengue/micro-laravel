@@ -48,10 +48,17 @@ const Table = (props: Props) => {
 
     //component did mount
     useEffect(() => {
-        (async function getGenres() {
+        let isSubscribed = true;
+        (async () => {
             const {data} = await httpGenre.list();
-            setData(data.data);
+            if(! isSubscribed) {
+                setData(data.data);
+            }
         })();
+
+        return () => {
+            isSubscribed = false;
+        }
         // httpVideo.get('genres').then(
         //     response => setData(response.data.data)
         // )
