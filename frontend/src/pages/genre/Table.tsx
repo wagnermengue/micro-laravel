@@ -1,7 +1,7 @@
 import * as React from 'react';
 import MUIDataTable, {MUIDataTableColumn} from "mui-datatables";
 import {useEffect, useState} from "react";
-import {httpVideo} from "../../util/http";
+import httpGenre from "../../util/http/genre-http";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import {Chip} from "@material-ui/core";
@@ -48,9 +48,13 @@ const Table = (props: Props) => {
 
     //component did mount
     useEffect(() => {
-        httpVideo.get('genres').then(
-            response => setData(response.data.data)
-        )
+        (async function getGenres() {
+            const {data} = await httpGenre.list();
+            setData(data.data);
+        })();
+        // httpVideo.get('genres').then(
+        //     response => setData(response.data.data)
+        // )
     }, []);
 
     return (

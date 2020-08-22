@@ -53,9 +53,14 @@ const Table = (props: Props) => {
 
     //component did mount
     useEffect(() => {
-        categoryHttp
-            .list<{data: Category[]}>()
-            .then(({data}) => setData(data.data))
+        (async function getCategories() {
+            const {data} = await categoryHttp.list<{data: Category[]}>();
+            setData(data.data);
+        })();
+        // categoryHttp
+        //     .list<{data: Category[]}>()
+        //     .then(({data}) => setData(data.data))
+
         // httpVideo.get('categories').then(
         //     response => setData(response.data.data)
         // )

@@ -58,7 +58,7 @@ export const Form = () => {
     }, [register]);
 
     useEffect(() => {
-        async function loadData() {
+        (async function loadData() {
             setLoading(true);
             const promises = [categoryHttp.list()];
             if (id) {
@@ -82,9 +82,7 @@ export const Form = () => {
             } finally {
                 setLoading(false)
             }
-        }
-
-        loadData();
+        })();
     }, []);
 
     async function onSubmit(formData, event) {

@@ -51,7 +51,8 @@ export const Form = () => {
             return
         }
 
-        async function getCategory() {
+        //iife
+        (async function getCategory() {
             setLoading(true);
             try {
                 const {data} = await categoryHttp.get(id);
@@ -65,9 +66,7 @@ export const Form = () => {
             } finally {
                 setLoading(false)
             }
-        }
-
-        getCategory();
+        })();
 
         // categoryHttp
         //     .get(id)
