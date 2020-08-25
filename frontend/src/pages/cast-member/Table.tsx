@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import {httpVideo} from "../../util/http";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
+import {CastMember, ListResponse} from "../../util/models";
 
 const CastMemberTypeMap = {
     1: 'Diretor',
@@ -39,13 +40,13 @@ type Props = {};
 
 const Table = (props: Props) => {
 
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<CastMember[]>([]);
 
     //component did mount
     useEffect(() => {
         let isSubscribed = true;
         (async () => {
-            const {data} = await httpVideo.get('cast_members');
+            const {data} = await httpVideo.get<ListResponse<CastMember>>('cast_members');
             if(isSubscribed) {
                 setData(data.data);
             }

@@ -6,6 +6,7 @@ import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import categoryHttp from "../../util/http/category-http";
 import {BadgeNo, BadgeYes} from "../../components/Badge";
+import {Category, ListResponse} from "../../util/models";
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -32,18 +33,6 @@ const columnsDefinition: MUIDataTableColumn[] = [
     }
 ];
 
-const data = [
-    {name: "teste1", is_active: true, created_at: "2019-01-02"},
-    {name: "teste2", is_active: true, created_at: "2020-01-02"},
-    {name: "teste3", is_active: false, created_at: "2019-06-19"},
-    {name: "teste4", is_active: true, created_at: "2019-03-02"}
-];
-
-interface Category{
-    id: string;
-    name: string;
-}
-
 type Props = {
 
 };
@@ -55,7 +44,7 @@ const Table = (props: Props) => {
     useEffect(() => {
         let isSubscribed = true;
         (async () => {
-            const {data} = await categoryHttp.list<{data: Category[]}>();
+            const {data} = await categoryHttp.list<ListResponse<Category>>();
             if(isSubscribed) {
                 setData(data.data);
             }

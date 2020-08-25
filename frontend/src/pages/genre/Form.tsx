@@ -8,6 +8,7 @@ import * as yup from "../../util/vendor/yup";
 import {yupResolver} from "@hookform/resolvers";
 import {useSnackbar} from "notistack";
 import {useHistory, useParams} from "react-router";
+import {Category, Genre} from "../../util/models";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -41,8 +42,8 @@ export const Form = () => {
     const snackbar = useSnackbar();
     const history = useHistory();
     const {id} = useParams();
-    const [genre, setGenre] = useState<{ id: string | null }>();
-    const [categories, setCategories] = useState<any[]>([]);
+    const [genre, setGenre] = useState<Genre>();
+    const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
 
 

@@ -5,6 +5,7 @@ import httpGenre from "../../util/http/genre-http";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import {Chip} from "@material-ui/core";
+import {Genre, ListResponse} from "../../util/models";
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -44,13 +45,13 @@ type Props = {};
 
 const Table = (props: Props) => {
 
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<Genre[]>([]);
 
     //component did mount
     useEffect(() => {
         let isSubscribed = true;
         (async () => {
-            const {data} = await httpGenre.list();
+            const {data} = await httpGenre.list<ListResponse<Genre>>();
             if(isSubscribed) {
                 setData(data.data);
             }

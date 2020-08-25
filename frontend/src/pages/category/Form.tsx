@@ -7,6 +7,7 @@ import * as yup from '../../util/vendor/yup';
 import {useParams, useHistory} from 'react-router';
 import {useEffect, useState} from "react";
 import {useSnackbar} from "notistack";
+import {Category} from "../../util/models";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -32,7 +33,7 @@ export const Form = () => {
     const snackbar = useSnackbar();
     const history = useHistory();
     const {id} = useParams();
-    const [category, setCategories] = useState<{ id: string }>();
+    const [category, setCategories] = useState<Category>();
     const [loading, setLoading] = useState<boolean>(false);
 
     const buttonProps: ButtonProps = {
