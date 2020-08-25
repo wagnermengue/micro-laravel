@@ -58,7 +58,8 @@ export const Form = () => {
     }, [register]);
 
     useEffect(() => {
-        (async function loadData() {
+        let isSubscribe = true;
+        (async () => {
             setLoading(true);
             const promises = [categoryHttp.list()];
             if (id) {
@@ -66,13 +67,16 @@ export const Form = () => {
             }
             try {
                 const [categoriesResponse, genreResponse] = await Promise.all(promises);
-                setCategories(categoriesResponse.data.data);
-                if (id) {
-                    setGenre(genreResponse.data.data);
-                    reset({
-                        ...genreResponse.data.data,
-                        categories_id: genreResponse.data.data.categories.map(category => category.id)
-                    });
+                if (isSubscribe) {
+                    setCategories(categoriesResponse.data.data);
+                    if (id) {
+                        setGenre(genreResponse.data.data);
+                        const categories_id = genreResponse.data.data.categories.map(category => category.id)
+                        reset({
+                            ...genreResponse.data.data,
+                            categories_id
+                        });
+                    }
                 }
             } catch (error) {
                 console.log(error);
@@ -83,6 +87,10 @@ export const Form = () => {
                 setLoading(false)
             }
         })();
+
+        return () => {
+            isSubscribe = false;
+        }
     }, []);
 
     async function onSubmit(formData, event) {

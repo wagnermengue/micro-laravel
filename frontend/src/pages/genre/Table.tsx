@@ -51,7 +51,7 @@ const Table = (props: Props) => {
         let isSubscribed = true;
         (async () => {
             const {data} = await httpGenre.list();
-            if(! isSubscribed) {
+            if(isSubscribed) {
                 setData(data.data);
             }
         })();
