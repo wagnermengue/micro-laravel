@@ -8,14 +8,7 @@ import {useParams, useHistory} from 'react-router';
 import {useEffect, useState} from "react";
 import {useSnackbar} from "notistack";
 import {Category} from "../../util/models";
-
-const useStyles = makeStyles((theme: Theme) => {
-    return {
-        submit: {
-            margin: theme.spacing(1)
-        }
-    }
-});
+import SubmitActions from "../../components/SubmitActions";
 
 const validationSchema = yup.object().shape({
     name: yup.string().required()
@@ -29,19 +22,11 @@ export const Form = () => {
         }
     });
 
-    const classes = useStyles();
     const snackbar = useSnackbar();
     const history = useHistory();
     const {id} = useParams();
     const [category, setCategories] = useState<Category>();
     const [loading, setLoading] = useState<boolean>(false);
-
-    const buttonProps: ButtonProps = {
-        className: classes.submit,
-        color: 'secondary',
-        variant: "contained",
-        disabled: loading
-    }
 
     useEffect(() => {
         register({name: "is_active"})
@@ -145,10 +130,10 @@ export const Form = () => {
                 labelPlacement={'end'}
                 disabled={loading}
             />
-            <Box dir={"rtl"}>
-                <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
-                <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
-            </Box>
+            <SubmitActions
+                disabledButtons={loading}
+                handleSave={() => onSubmit(getValues(), null)}
+            />
         </form>
     );
 };
