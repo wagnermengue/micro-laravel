@@ -7,12 +7,13 @@ import parseISO from "date-fns/parseISO";
 import categoryHttp from "../../util/http/category-http";
 import {BadgeNo, BadgeYes} from "../../components/Badge";
 import {Category, ListResponse} from "../../util/models";
-import DefaultTable from '../../components/Table';
+import DefaultTable, {TableColumn} from '../../components/Table';
 
-const columnsDefinition: MUIDataTableColumn[] = [
+const columnsDefinition: TableColumn[] = [
     {
         name: 'name',
         label: 'Nome',
+        width: '50%',
     },
     {
         name: 'is_active',
