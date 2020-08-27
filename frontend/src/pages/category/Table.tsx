@@ -11,9 +11,17 @@ import DefaultTable, {TableColumn} from '../../components/Table';
 
 const columnsDefinition: TableColumn[] = [
     {
+        name: 'id',
+        label: 'ID',
+        options: {
+            sort: false
+        },
+        width: '30%',
+    },
+    {
         name: 'name',
         label: 'Nome',
-        width: '50%',
+        width: '40%',
     },
     {
         name: 'is_active',
@@ -22,7 +30,8 @@ const columnsDefinition: TableColumn[] = [
             customBodyRender(value, tableMeta, updateValue) {
                 return value ? <BadgeYes /> : <BadgeNo /> ;
             }
-        }
+        },
+        width: '4%',
     },
     {
         name: 'created_at',
@@ -31,7 +40,13 @@ const columnsDefinition: TableColumn[] = [
             customBodyRender(value, tableMeta, updateValue) {
                 return <span>{format(parseISO(value), "dd/MM/yyyy")}</span>;
             }
-        }
+        },
+        width: '10%',
+    },
+    {
+        name: 'actions',
+        label: 'Ações',
+        width: '13%',
     }
 ];
 
