@@ -68,7 +68,7 @@ export const Form = () => {
         (async function getCastMember() {
             setLoading(true);
             try {
-                const {data} = await castMemberHttp.get<CastMember>(id);
+                const {data} = await castMemberHttp.get(id);
                 setCastMember(data.data);
                 reset(data.data);
             } catch (error) {

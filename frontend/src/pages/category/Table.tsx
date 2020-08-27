@@ -7,6 +7,7 @@ import parseISO from "date-fns/parseISO";
 import categoryHttp from "../../util/http/category-http";
 import {BadgeNo, BadgeYes} from "../../components/Badge";
 import {Category, ListResponse} from "../../util/models";
+import DefaultTable from '../../components/Table';
 
 const columnsDefinition: MUIDataTableColumn[] = [
     {
@@ -64,7 +65,7 @@ const Table = (props: Props) => {
 
     return (
         <div>
-            <MUIDataTable
+            <DefaultTable
                 title="Tabela de categorias"
                 columns={columnsDefinition}
                 data={data}
