@@ -8,6 +8,7 @@ import categoryHttp from "../../util/http/category-http";
 import {BadgeNo, BadgeYes} from "../../components/Badge";
 import {Category, ListResponse} from "../../util/models";
 import DefaultTable, {TableColumn} from '../../components/Table';
+import {useSnackbar} from "notistack";
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -55,15 +56,27 @@ type Props = {
 };
 const Table = (props: Props) => {
 
+    const snackbar = useSnackbar();
     const [data, setData] = useState<Category[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
 
     //component did mount
     useEffect(() => {
         let isSubscribed = true;
         (async () => {
-            const {data} = await categoryHttp.list<ListResponse<Category>>();
-            if(isSubscribed) {
-                setData(data.data);
+            setLoading(true);
+            try {
+                const {data} = await categoryHttp.list<ListResponse<Category>>();
+                if(isSubscribed) {
+                    setData(data.data);
+                }
+            } catch (error) {
+                console.log(error);
+                snackbar.enqueueSnackbar(
+                    'Não foi possível carregar as informações',
+                    {variant: "error"})
+            } finally {
+                setLoading(false)
             }
         })();
 
@@ -85,6 +98,7 @@ const Table = (props: Props) => {
                 title="Tabela de categorias"
                 columns={columnsDefinition}
                 data={data}
+                loading={loading}
             />
         </div>
     );
