@@ -9,6 +9,7 @@ services:
           - "3000:3000"
           - "35729:35729"
       environment:
+          - COMPOSER_MEMORY_LIMIT=2G
           - CHOKIDAR_USEPOLLING=true
       volumes:
           - .:/var/www:cached

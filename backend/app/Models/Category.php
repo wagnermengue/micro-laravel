@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\ModelFilters\CategoryFilter;
 use App\Traits\Uuid;
+use EloquentFilter\Filterable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends Model
 {
-    use SoftDeletes, Uuid;
+    use SoftDeletes, Uuid, Filterable;
 
     public $incrementing = false;
 
@@ -26,4 +28,9 @@ class Category extends Model
         'id' => 'string',
         'is_active' => 'boolean',
     ];
+
+    public function modelFilter()
+    {
+        return $this->provideFilter(CategoryFilter::class);
+    }
 }
