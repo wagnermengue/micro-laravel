@@ -1,14 +1,15 @@
 import * as React from 'react';
-import MUIDataTable, {MUIDataTableColumn} from "mui-datatables";
 import {useEffect, useState} from "react";
-import {httpVideo} from "../../util/http";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import categoryHttp from "../../util/http/category-http";
 import {BadgeNo, BadgeYes} from "../../components/Badge";
 import {Category, ListResponse} from "../../util/models";
-import DefaultTable, {TableColumn} from '../../components/Table';
+import DefaultTable, {makeActionStyles, TableColumn} from '../../components/Table';
 import {useSnackbar} from "notistack";
+import {IconButton, MuiThemeProvider, Theme} from "@material-ui/core";
+import EditIcon from "@material-ui/icons/Edit";
+import {Link} from "react-router-dom";
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -48,13 +49,24 @@ const columnsDefinition: TableColumn[] = [
         name: 'actions',
         label: 'Ações',
         width: '13%',
+        options: {
+            sort: false,
+            customBodyRender(value, tableMeta, updateValue): JSX.Element {
+                return (
+                    <IconButton
+                        color={'secondary'}
+                        component={Link}
+                        to={`/categories/${tableMeta.rowData[0]}/edit`}
+                    >
+                        <EditIcon/>
+                    </IconButton>
+                );
+            }
+        }
     }
 ];
 
-type Props = {
-
-};
-const Table = (props: Props) => {
+const Table = () => {
 
     const snackbar = useSnackbar();
     const [data, setData] = useState<Category[]>([]);
@@ -93,14 +105,14 @@ const Table = (props: Props) => {
     }, []);
 
     return (
-        <div>
+        <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length-1)}>
             <DefaultTable
                 title="Tabela de categorias"
                 columns={columnsDefinition}
                 data={data}
                 loading={loading}
             />
-        </div>
+        </MuiThemeProvider>
     );
 };
 

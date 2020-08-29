@@ -1,13 +1,16 @@
 import * as React from 'react';
-import MUIDataTable, {MUIDataTableColumn} from "mui-datatables";
+import MUIDataTable from "mui-datatables";
 import {useEffect, useState} from "react";
 import httpGenre from "../../util/http/genre-http";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
-import {Chip} from "@material-ui/core";
+import {Chip, IconButton, MuiThemeProvider} from "@material-ui/core";
 import {Genre, ListResponse} from "../../util/models";
+import {makeActionStyles, TableColumn} from "../../components/Table";
+import {Link} from "react-router-dom";
+import EditIcon from "@material-ui/icons/Edit";
 
-const columnsDefinition: MUIDataTableColumn[] = [
+const columnsDefinition: TableColumn[] = [
     {
         name: 'name',
         label: 'Nome',
@@ -38,6 +41,25 @@ const columnsDefinition: MUIDataTableColumn[] = [
                 return <span>{format(parseISO(value), "dd/MM/yyyy")}</span>;
             }
         }
+    },
+    {
+        name: 'actions',
+        label: 'Ações',
+        width: '13%',
+        options: {
+            sort: false,
+            customBodyRender(value, tableMeta, updateValue): JSX.Element {
+                return (
+                    <IconButton
+                        color={'secondary'}
+                        component={Link}
+                        to={`/genres/${tableMeta.rowData[0]}/edit`}
+                    >
+                        <EditIcon/>
+                    </IconButton>
+                );
+            }
+        }
     }
 ];
 
@@ -66,13 +88,13 @@ const Table = (props: Props) => {
     }, []);
 
     return (
-        <div>
+        <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length-1)}>
             <MUIDataTable
                 title="Tabela de gêneros"
                 columns={columnsDefinition}
                 data={data}
             />
-        </div>
+        </MuiThemeProvider>
     );
 };
 
