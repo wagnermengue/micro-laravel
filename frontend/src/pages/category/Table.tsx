@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import categoryHttp from "../../util/http/category-http";
@@ -10,6 +10,10 @@ import {useSnackbar} from "notistack";
 import {IconButton, MuiThemeProvider, Theme} from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import {Link} from "react-router-dom";
+
+interface SearchState {
+    search: string
+}
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -30,7 +34,7 @@ const columnsDefinition: TableColumn[] = [
         label: 'Ativo?',
         options: {
             customBodyRender(value, tableMeta, updateValue) {
-                return value ? <BadgeYes /> : <BadgeNo /> ;
+                return value ? <BadgeYes/> : <BadgeNo/>;
             }
         },
         width: '4%',
@@ -69,43 +73,44 @@ const columnsDefinition: TableColumn[] = [
 const Table = () => {
 
     const snackbar = useSnackbar();
+    const subscribed = useRef(true);
     const [data, setData] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [searchState, setSearchState] = useState<SearchState>({search: ''});
 
     //component did mount
     useEffect(() => {
-        let isSubscribed = true;
-        (async () => {
-            setLoading(true);
-            try {
-                const {data} = await categoryHttp.list<ListResponse<Category>>();
-                if(isSubscribed) {
-                    setData(data.data);
-                }
-            } catch (error) {
-                console.log(error);
-                snackbar.enqueueSnackbar(
-                    'Não foi possível carregar as informações',
-                    {variant: "error"})
-            } finally {
-                setLoading(false)
-            }
-        })();
-
+        subscribed.current = true; //evita memory leak
+        getData();
         return () => {
-            isSubscribed = false;
+            subscribed.current = false;
         }
-        // categoryHttp
-        //     .list<{data: Category[]}>()
-        //     .then(({data}) => setData(data.data))
+    }, [searchState]);
 
-        // httpVideo.get('categories').then(
-        //     response => setData(response.data.data)
-        // )
-    }, []);
+    async function getData() {
+        setLoading(true);
+        try {
+            const {data} = await categoryHttp.list<ListResponse<Category>>({
+                queryParams: {
+                    search: searchState.search
+                }
+            });
+            if (subscribed.current) {
+                setData(data.data);
+            }
+        } catch (error) {
+            console.log(error);
+            snackbar.enqueueSnackbar(
+                'Não foi possível carregar as informações',
+                {variant: "error"})
+        } finally {
+            setLoading(false)
+        }
+    }
+
 
     return (
-        <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length-1)}>
+        <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
             <DefaultTable
                 title="Tabela de categorias"
                 columns={columnsDefinition}
