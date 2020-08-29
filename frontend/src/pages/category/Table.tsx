@@ -164,7 +164,7 @@ const Table = () => {
                         ...prevState,
                         pagination: {
                             ...prevState.pagination,
-                            per_page: perPage;
+                            per_page: perPage
                         }
                     })))
                 }}
