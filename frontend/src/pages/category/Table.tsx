@@ -152,6 +152,9 @@ const Table = () => {
             }
         } catch (error) {
             console.log(error);
+            if (categoryHttp.isCanceledRequest(error)) {
+                return;
+            }
             snackbar.enqueueSnackbar(
                 'Não foi possível carregar as informações',
                 {variant: "error"})
