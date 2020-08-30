@@ -21,7 +21,7 @@ export default class HttpResource {
         if (options && options.queryParams) {
             config.params = options.queryParams;
         }
-        return this.http.get<T>(this.resource);
+        return this.http.get<T>(this.resource, config);
     }
 
     get<T = any>(id): Promise<AxiosResponse<T>> {

@@ -14,10 +14,11 @@ interface FilterResetButtonProps {
 export const FilterResetButton: React.FC<FilterResetButtonProps> = (props) => {
     const classes = useStyles()
     return (
-        <Tooltip title={'Limpar busca'} children={}>
-            <IconButton className={classes.iconButton} onClick={props.handleClick}>
-                <ClearAll />
-            </IconButton>
-        </Tooltip>
+        <div>teste</div>
+        // <Tooltip title={'Limpar busca'} children={}>
+        //     <IconButton className={classes.iconButton} onClick={props.handleClick}>
+        //         <ClearAll />
+        //     </IconButton>
+        // </Tooltip>
     );
 };

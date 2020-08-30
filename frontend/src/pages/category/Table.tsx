@@ -177,11 +177,11 @@ const Table = () => {
                     serverSide: true,
                     searchText: searchState.search,
                     page: searchState.pagination.page - 1,
-                    rowPerPage: searchState.pagination.per_page,
+                    rowsPerPage: searchState.pagination.per_page,
                     count: searchState.pagination.total,
-                    customToolbar: () => (
-                        <FilterResetButton handleClick={setSearchState(initialState)}/>
-                    ),
+                    // customToolbar: () => (
+                    //     <FilterResetButton handleClick={setSearchState(initialState)}/>
+                    // ),
                     onSearchChange: (value) => setSearchState((prevState => ({
                         ...prevState,
                         search: value,
