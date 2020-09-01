@@ -28,6 +28,8 @@
     "react-hook-form": "^6.4.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
+    "redux": "^4.0.5",
+    "reduxsauce": "^1.2.0",
     "route-parser": "0.0.5",
     "typescript": "^3.7.5",
     "yup": "^0.29.3"
