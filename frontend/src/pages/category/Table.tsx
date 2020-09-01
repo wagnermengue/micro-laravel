@@ -11,6 +11,7 @@ import {IconButton, MuiThemeProvider, Theme} from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import {Link} from "react-router-dom";
 import {FilterResetButton} from "../../components/Table/FilterResetButton";
+import reducer, {INITIAL_STATE, Creators} from "../../store/search";
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -67,62 +68,8 @@ const columnsDefinition: TableColumn[] = [
     }
 ];
 
-const INITIAL_STATE = {
-    search: '',
-    pagination: {
-        page: 1,
-        per_page: 10,
-        total: 0
-    },
-    order: {
-        sort: null,
-        dir: null
-    }
-};
-
 function init(INITIAL_STATE) {
     return INITIAL_STATE;
-}
-
-function reducer(state, action) {
-    switch (action.type) {
-        case 'search':
-            return {
-                ...state,
-                search: action.search,
-                pagination: {
-                    ...state.pagination,
-                    page: 1
-                }
-            };
-        case 'page':
-            return {
-                ...state,
-                pagination: {
-                    ...state.pagination,
-                    page: action.page
-                }
-            };
-        case 'per_page':
-            return {
-                ...state,
-                pagination: {
-                    ...state.pagination,
-                    page: action.per_page
-                }
-            };
-        case 'order':
-            return {
-                ...state,
-                order: {
-                    sort: action.sort,
-                    dir: action.dir
-                }
-            };
-        case 'reset':
-        default:
-            return INITIAL_STATE;
-    }
 }
 
 const Table = () => {
@@ -204,21 +151,20 @@ const Table = () => {
                 loading={loading}
                 options={{
                     serverSide: true,
-                    searchText: searchState.search,
+                    searchText: searchState.search as any,
                     page: searchState.pagination.page - 1,
                     rowsPerPage: searchState.pagination.per_page,
                     count: searchState.pagination.total,
                     // customToolbar: () => (
                     //     <FilterResetButton handleClick={dispatch({type: 'reset')}/>
                     // ),
-                    onSearchChange: (value) => dispatch({type: 'search', search: value}),
-                    onChangePage: (page) => dispatch({type: 'search', page: page + 1}),
-                    onChangeRowsPerPage: (perPage) => dispatch({type: 'search', page: perPage}),
-                    onColumnSortChange: (changedColumn: string, direction: string) => dispatch({
-                        type: 'order',
+                    onSearchChange: (value) => dispatch(Creators.setSearch({search: value})),
+                    onChangePage: (page) => dispatch(Creators.setPage({page: page + 1})),
+                    onChangeRowsPerPage: (perPage) => dispatch(Creators.setPerPage({per_page: perPage})),
+                    onColumnSortChange: (changedColumn: string, direction: string) => dispatch(Creators.setOrder({
                         sort: changedColumn,
                         dir: direction.includes('desc') ? 'desc' : 'asc'
-                    }),
+                    })),
                 }}
             />
         </MuiThemeProvider>

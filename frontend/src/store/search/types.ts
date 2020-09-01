@@ -11,8 +11,8 @@ export interface Order {
     dir: string | null;
 }
 
-export interface SearchState {
-    search: string;
+export interface State {
+    search: string | {value, [key: string]: any};
     pagination: Pagination;
     order: Order
 }
