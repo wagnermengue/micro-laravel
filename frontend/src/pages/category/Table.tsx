@@ -77,6 +77,7 @@ const Table = () => {
     const subscribed = useRef(true);
     const [data, setData] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
     const [searchState, dispatch] = useReducer(reducer, INITIAL_STATE, init);
     //const [searchState, setSearchState] = useState<SearchState>(initialState);
 
@@ -120,6 +121,7 @@ const Table = () => {
             });
             if (subscribed.current) {
                 setData(data.data);
+                setTotalRecords(data.meta.total);
                 // setSearchState((prevState => ({
                 //     ...prevState,
                 //     pagination: {
@@ -154,10 +156,10 @@ const Table = () => {
                     searchText: searchState.search as any,
                     page: searchState.pagination.page - 1,
                     rowsPerPage: searchState.pagination.per_page,
-                    count: searchState.pagination.total,
-                    // customToolbar: () => (
-                    //     <FilterResetButton handleClick={dispatch({type: 'reset')}/>
-                    // ),
+                    count: totalRecords,
+                    customToolbar: () => (
+                        <FilterResetButton handleClick={() => dispatch(Creators.setReset())}/>
+                    ),
                     onSearchChange: (value) => dispatch(Creators.setSearch({search: value})),
                     onChangePage: (page) => dispatch(Creators.setPage({page: page + 1})),
                     onChangeRowsPerPage: (perPage) => dispatch(Creators.setPerPage({per_page: perPage})),
@@ -169,6 +171,6 @@ const Table = () => {
             />
         </MuiThemeProvider>
     );
-};
+}
 
 export default Table;
