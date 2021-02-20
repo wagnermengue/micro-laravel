@@ -11,7 +11,7 @@ import {IconButton, MuiThemeProvider, Theme} from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import {Link} from "react-router-dom";
 import {FilterResetButton} from "../../components/Table/FilterResetButton";
-import reducer, {INITIAL_STATE, Creators} from "../../store/filter";
+import useFilter from "../../hooks/useFilter";
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -68,17 +68,16 @@ const columnsDefinition: TableColumn[] = [
     }
 ];
 
-function init(INITIAL_STATE) {
-    return INITIAL_STATE;
-}
-
 const Table = () => {
     const snackbar = useSnackbar();
     const subscribed = useRef(true);
     const [data, setData] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [totalRecords, setTotalRecords] = useState<number>(0);
-    const [filterState, dispatch] = useReducer(reducer, INITIAL_STATE, init);
+    const {
+        filterState,
+        dispatch,
+        totalRecords,
+        setTotalRecords} = useFilter();
     //const [filterState, setSearchState] = useState<SearchState>(initialState);
 
     const columns = columnsDefinition.map(column => {
