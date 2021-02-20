@@ -3,6 +3,7 @@ import reducer, {INITIAL_STATE} from "../store/filter";
 import {Actions as FilterActions, State as FilterState} from "../store/filter/types";
 import {Creators} from "../store/filter";
 import {MUIDataTableColumn, MUIDataTableColumnOptions} from "mui-datatables";
+import {useDebounce} from "use-debounce";
 
 interface FilterManagerOptions {
     columns: MUIDataTableColumn[];
@@ -21,6 +22,7 @@ export default function useFilter(options: FilterManagerOptions) {
     //pegar o state da URL
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [filterState, dispatch] = useReducer(reducer, INITIAL_STATE, init);
+    const [debouncedFilterState] = useDebounce(filterState, options.debounceTime);
     // const [filterState, dispatch] = useReducer<Reducer<FilterState, FilterActions>>(reducer, INITIAL_STATE, init);
 
     // filterManager.state = <FilterState>filterState;
@@ -31,6 +33,7 @@ export default function useFilter(options: FilterManagerOptions) {
         columns: filterManager.columns,
         filterManager,
         filterState,
+        debouncedFilterState,
         dispatch,
         totalRecords,
         setTotalRecords
@@ -44,14 +47,12 @@ export class FilterManager {
     columns: ({name: string; options?: MUIDataTableColumnOptions; label?: string; order: { sortDirection: string | null; name: string; options?: MUIDataTableColumnOptions; label?: string } } | MUIDataTableColumn)[];
     rowsPerPage: number;
     rowsPerPageOptions: number[];
-    debounceTime: number;
 
     constructor(options: FilterManagerOptions) {
         const {columns, rowsPerPage, rowsPerPageOptions, debounceTime} = options;
         this.columns = columns;
         this.rowsPerPage = rowsPerPage;
         this.rowsPerPageOptions = rowsPerPageOptions;
-        this.debounceTime = debounceTime;
     }
 
     changeSearch(value){
@@ -90,5 +91,13 @@ export class FilterManager {
             }
             return column
         });
+    }
+
+    cleanSearchText(text) {
+        let newText = text
+        if (text && text.value !== undefined) {
+            newText = text.value;
+        }
+        return newText;
     }
 }

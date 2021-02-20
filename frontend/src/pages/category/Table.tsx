@@ -69,6 +69,9 @@ const columnsDefinition: TableColumn[] = [
     }
 ];
 
+const debouncedTime = 300;
+const debouncedSearchTime = 300;
+
 const Table = () => {
     const snackbar = useSnackbar();
     const subscribed = useRef(true);
@@ -78,12 +81,13 @@ const Table = () => {
         columns,
         filterManager,
         filterState,
+        debouncedFilterState,
         dispatch,
         totalRecords,
         setTotalRecords
     } = useFilter({
         columns: columnsDefinition,
-        debounceTime: 500,
+        debounceTime: debouncedTime,
         rowsPerPage: 10,
         rowsPerPageOptions: [10, 25, 50]
     });
@@ -96,10 +100,10 @@ const Table = () => {
             subscribed.current = false;
         }
     }, [
-        filterState.search,
-        filterState.pagination.page,
-        filterState.pagination.per_page,
-        filterState.order
+        filterManager.cleanSearchText(debouncedFilterState.search),
+        debouncedFilterState.pagination.page,
+        debouncedFilterState.pagination.per_page,
+        debouncedFilterState.order
     ]);
 
     async function getData() {
@@ -108,7 +112,7 @@ const Table = () => {
             const {data} = await categoryHttp.list<ListResponse<Category>>({
                 queryParams: {
                     // filter: filterState.filter,
-                    search: cleanSearchText(filterState.search),
+                    search: filterManager.cleanSearchText(filterState.search),
                     page: filterState.pagination.page,
                     per_page: filterState.pagination.per_page,
                     sort: filterState.order.sort,
@@ -139,14 +143,6 @@ const Table = () => {
         }
     }
 
-    function cleanSearchText(text) {
-        let newText = text
-        if (text && text.value !== undefined) {
-            newText = text.value;
-        }
-        return newText;
-    }
-
 
     return (
         <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
@@ -155,7 +151,7 @@ const Table = () => {
                 columns={columns}
                 data={data}
                 loading={loading}
-                debouncedSearchTime={500}
+                debouncedSearchTime={debouncedSearchTime}
                 options={{
                     serverSide: true,
                     responsive: "scrollMaxHeight",
