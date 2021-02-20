@@ -11,7 +11,7 @@ import {IconButton, MuiThemeProvider, Theme} from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import {Link} from "react-router-dom";
 import {FilterResetButton} from "../../components/Table/FilterResetButton";
-import reducer, {INITIAL_STATE, Creators} from "../../store/search";
+import reducer, {INITIAL_STATE, Creators} from "../../store/filter";
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -78,16 +78,16 @@ const Table = () => {
     const [data, setData] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [totalRecords, setTotalRecords] = useState<number>(0);
-    const [searchState, dispatch] = useReducer(reducer, INITIAL_STATE, init);
-    //const [searchState, setSearchState] = useState<SearchState>(initialState);
+    const [filterState, dispatch] = useReducer(reducer, INITIAL_STATE, init);
+    //const [filterState, setSearchState] = useState<SearchState>(initialState);
 
     const columns = columnsDefinition.map(column => {
-        return column.name === searchState.order.sort
+        return column.name === filterState.order.sort
         ? {
             ...column,
             order: {
                 ...column,
-                sortDirection: searchState.order.dir
+                sortDirection: filterState.order.dir
             }
         }
         : column
@@ -101,10 +101,10 @@ const Table = () => {
             subscribed.current = false;
         }
     }, [
-        searchState.search,
-        searchState.pagination.page,
-        searchState.pagination.per_page,
-        searchState.order
+        filterState.search,
+        filterState.pagination.page,
+        filterState.pagination.per_page,
+        filterState.order
     ]);
 
     async function getData() {
@@ -112,12 +112,12 @@ const Table = () => {
         try {
             const {data} = await categoryHttp.list<ListResponse<Category>>({
                 queryParams: {
-                    // search: searchState.search,
-                    search: cleanSearchText(searchState.search),
-                    page: searchState.pagination.page,
-                    per_page: searchState.pagination.per_page,
-                    sort: searchState.order.sort,
-                    dir: searchState.order.dir,
+                    // filter: filterState.filter,
+                    search: cleanSearchText(filterState.search),
+                    page: filterState.pagination.page,
+                    per_page: filterState.pagination.per_page,
+                    sort: filterState.order.sort,
+                    dir: filterState.order.dir,
                 }
             });
             if (subscribed.current) {
@@ -164,9 +164,9 @@ const Table = () => {
                 options={{
                     serverSide: true,
                     responsive: "scrollMaxHeight",
-                    searchText: searchState.search as any,
-                    page: searchState.pagination.page - 1,
-                    rowsPerPage: searchState.pagination.per_page,
+                    searchText: filterState.search as any,
+                    page: filterState.pagination.page - 1,
+                    rowsPerPage: filterState.pagination.per_page,
                     count: totalRecords,
                     customToolbar: () => (
                         <FilterResetButton handleClick={() => dispatch(Creators.setReset())}/>
