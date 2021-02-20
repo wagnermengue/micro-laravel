@@ -8,7 +8,7 @@ export interface TableColumn extends MUIDataTableColumn {
     width?: string
 }
 
-const defaultOptions: MUIDataTableOptions = {
+const makeDefaultOptions = (debouncedSearchTime): MUIDataTableOptions => ({
     print: false,
     download: false,
     textLabels: {
@@ -53,13 +53,15 @@ const defaultOptions: MUIDataTableOptions = {
             onSearch={handleSearch}
             onHide={hideSearch}
             options={options}
+            debounceTime={debouncedSearchTime}
         />
     }
-};
+});
 
 export interface TableProps extends MUIDataTableProps {
     columns: TableColumn[];
     loading?: boolean;
+    debouncedSearchTime?: number;
 }
 
 const Table: React.FC<TableProps> = (props) => {
@@ -88,8 +90,8 @@ const Table: React.FC<TableProps> = (props) => {
     }
 
     function applyResponsive() {
-        //newProps.options.responsive = isSmOrDown ? 'scrollMaxHeight' : 'stacked';
-        newProps.options.responsive = isSmOrDown ? 'vertical' : 'simple';
+        newProps.options.responsive = isSmOrDown ? 'scrollMaxHeight' : 'stacked';
+        // newProps.options.responsive = isSmOrDown ? 'vertical' : 'simple';
     }
 
     function getOriginalMuiDataTableProps() {
@@ -98,6 +100,8 @@ const Table: React.FC<TableProps> = (props) => {
 
     const theme = cloneDeep<Theme>(useTheme());
     const isSmOrDown = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const defaultOptions = makeDefaultOptions(props.debouncedSearchTime);
 
     const newProps = merge(
         {options: cloneDeep(defaultOptions)},

@@ -112,7 +112,8 @@ const Table = () => {
         try {
             const {data} = await categoryHttp.list<ListResponse<Category>>({
                 queryParams: {
-                    search: searchState.search,
+                    // search: searchState.search,
+                    search: cleanSearchText(searchState.search),
                     page: searchState.pagination.page,
                     per_page: searchState.pagination.per_page,
                     sort: searchState.order.sort,
@@ -143,6 +144,14 @@ const Table = () => {
         }
     }
 
+    function cleanSearchText(text) {
+        let newText = text
+        if (text && text.value !== undefined) {
+            newText = text.value;
+        }
+        return newText;
+    }
+
 
     return (
         <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
@@ -151,8 +160,10 @@ const Table = () => {
                 columns={columns}
                 data={data}
                 loading={loading}
+                debouncedSearchTime={500}
                 options={{
                     serverSide: true,
+                    responsive: "scrollMaxHeight",
                     searchText: searchState.search as any,
                     page: searchState.pagination.page - 1,
                     rowsPerPage: searchState.pagination.per_page,
