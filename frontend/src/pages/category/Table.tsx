@@ -71,6 +71,8 @@ const columnsDefinition: TableColumn[] = [
 
 const debouncedTime = 300;
 const debouncedSearchTime = 300;
+const rowsPerPage = 10;
+const rowsPerPageOptions = [10, 25, 50];
 
 const Table = () => {
     const snackbar = useSnackbar();
@@ -88,8 +90,8 @@ const Table = () => {
     } = useFilter({
         columns: columnsDefinition,
         debounceTime: debouncedTime,
-        rowsPerPage: 10,
-        rowsPerPageOptions: [10, 25, 50]
+        rowsPerPage,
+        rowsPerPageOptions
     });
 
     //component did mount
@@ -159,6 +161,7 @@ const Table = () => {
                     searchText: filterState.search as any,
                     page: filterState.pagination.page - 1,
                     rowsPerPage: filterState.pagination.per_page,
+                    rowsPerPageOptions,
                     count: totalRecords,
                     customToolbar: () => (
                         <FilterResetButton handleClick={() => dispatch(Creators.setReset())}/>
