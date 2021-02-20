@@ -95,6 +95,7 @@ const Table = () => {
     //component did mount
     useEffect(() => {
         subscribed.current = true; //evita memory leak
+        filterManager.pushHistory();
         getData();
         return () => {
             subscribed.current = false;

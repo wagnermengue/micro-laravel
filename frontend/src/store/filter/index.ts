@@ -69,7 +69,7 @@ function setPerPage(state = INITIAL_STATE, action: Typings.SetPerPageAction) : T
         ...state,
         pagination: {
             ...state.pagination,
-            page: action.payload.per_page
+            per_page: action.payload.per_page
         }
     };
 }

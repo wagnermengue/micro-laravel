@@ -4,28 +4,33 @@ import {Actions as FilterActions, State as FilterState} from "../store/filter/ty
 import {Creators} from "../store/filter";
 import {MUIDataTableColumn, MUIDataTableColumnOptions} from "mui-datatables";
 import {useDebounce} from "use-debounce";
+import {useHistory} from "react-router";
+import {History} from "history";
+
+function init(INITIAL_STATE) {
+    return INITIAL_STATE;
+}
 
 interface FilterManagerOptions {
     columns: MUIDataTableColumn[];
     rowsPerPage: number;
     rowsPerPageOptions: number[];
     debounceTime: number;
+    history: History;
 }
 
-function init(INITIAL_STATE) {
-    return INITIAL_STATE;
-}
+interface UseFilterOptions extends Omit<FilterManagerOptions, 'history'> {}
 
-export default function useFilter(options: FilterManagerOptions) {
-
-    const filterManager = new FilterManager(options)
+export default function useFilter(options: UseFilterOptions) {
+    const history = useHistory();
+    const filterManager = new FilterManager({...options, history});
     //pegar o state da URL
     const [totalRecords, setTotalRecords] = useState<number>(0);
     const [filterState, dispatch] = useReducer(reducer, INITIAL_STATE, init);
     const [debouncedFilterState] = useDebounce(filterState, options.debounceTime);
     // const [filterState, dispatch] = useReducer<Reducer<FilterState, FilterActions>>(reducer, INITIAL_STATE, init);
 
-    // filterManager.state = <FilterState>filterState;
+    filterManager.state = <FilterState>filterState;
     filterManager.dispatch = dispatch;
     filterManager.applyOrderInColumns();
 
@@ -47,12 +52,14 @@ export class FilterManager {
     columns: ({name: string; options?: MUIDataTableColumnOptions; label?: string; order: { sortDirection: string | null; name: string; options?: MUIDataTableColumnOptions; label?: string } } | MUIDataTableColumn)[];
     rowsPerPage: number;
     rowsPerPageOptions: number[];
+    history: History;
 
     constructor(options: FilterManagerOptions) {
-        const {columns, rowsPerPage, rowsPerPageOptions, debounceTime} = options;
+        const {columns, rowsPerPage, rowsPerPageOptions, history} = options;
         this.columns = columns;
         this.rowsPerPage = rowsPerPage;
         this.rowsPerPageOptions = rowsPerPageOptions;
+        this.history = history;
     }
 
     changeSearch(value){
@@ -77,19 +84,15 @@ export class FilterManager {
 
     applyOrderInColumns() {
         this.columns = this.columns.map(column => {
-            if (this.state) {
-                //debugger;
-                return column.name === this.state.order.sort
-                    ? {
+            return column.name === this.state.order.sort
+                ? {
+                    ...column,
+                    order: {
                         ...column,
-                        order: {
-                            ...column,
-                            sortDirection: this.state.order.dir
-                        }
+                        sortDirection: this.state.order.dir
                     }
-                    : column
-            }
-            return column
+                }
+                : column
         });
     }
 
@@ -99,5 +102,31 @@ export class FilterManager {
             newText = text.value;
         }
         return newText;
+    }
+
+    pushHistory() {
+        const newLocation = {
+            pathname: this.history.location.pathname,
+            search: '?' + new URLSearchParams(this.formatSearchParams() as any),
+            state: {
+                ...this.state,
+                search: this.cleanSearchText(this.state.search)
+            }
+        }
+        this.history.push(newLocation);
+    }
+
+    private formatSearchParams() {
+        const search = this.cleanSearchText(this.state.search);
+        return {
+            ...(search && search !== '' && {search: search}),
+            ...(this.state.pagination.page && this.state.pagination.page !== 1 && {page: this.state.pagination.page}),
+            ...(this.state.pagination.per_page && this.state.pagination.per_page !== 10 && {per_page: this.state.pagination.per_page}),
+            ...(this.state.order.sort && {
+                sort: this.state.order.sort,
+                dir: this.state.order.dir,
+            })
+        }
+
     }
 }
