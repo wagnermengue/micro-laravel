@@ -7,11 +7,12 @@ import {BadgeNo, BadgeYes} from "../../components/Badge";
 import {Category, ListResponse} from "../../util/models";
 import DefaultTable, {makeActionStyles, TableColumn} from '../../components/Table';
 import {useSnackbar} from "notistack";
-import {IconButton, MuiThemeProvider, Theme} from "@material-ui/core";
+import {debounce, IconButton, MuiThemeProvider, Theme} from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import {Link} from "react-router-dom";
 import {FilterResetButton} from "../../components/Table/FilterResetButton";
 import useFilter from "../../hooks/useFilter";
+import {Creators} from "../../store/filter";
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -74,22 +75,17 @@ const Table = () => {
     const [data, setData] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const {
+        columns,
+        filterManager,
         filterState,
         dispatch,
         totalRecords,
-        setTotalRecords} = useFilter();
-    //const [filterState, setSearchState] = useState<SearchState>(initialState);
-
-    const columns = columnsDefinition.map(column => {
-        return column.name === filterState.order.sort
-        ? {
-            ...column,
-            order: {
-                ...column,
-                sortDirection: filterState.order.dir
-            }
-        }
-        : column
+        setTotalRecords
+    } = useFilter({
+        columns: columnsDefinition,
+        debounceTime: 500,
+        rowsPerPage: 10,
+        rowsPerPageOptions: [10, 25, 50]
     });
 
     //component did mount
@@ -170,13 +166,12 @@ const Table = () => {
                     customToolbar: () => (
                         <FilterResetButton handleClick={() => dispatch(Creators.setReset())}/>
                     ),
-                    onSearchChange: (value) => dispatch(Creators.setSearch({search: value})),
-                    onChangePage: (page) => dispatch(Creators.setPage({page: page + 1})),
-                    onChangeRowsPerPage: (perPage) => dispatch(Creators.setPerPage({per_page: perPage})),
-                    onColumnSortChange: (changedColumn: string, direction: string) => dispatch(Creators.setOrder({
-                        sort: changedColumn,
-                        dir: direction.includes('desc') ? 'desc' : 'asc'
-                    })),
+                    onSearchChange: (value) => filterManager.changeSearch(value),
+                    onChangePage: (page) => filterManager.changePage(page),
+                    onChangeRowsPerPage: (perPage) => filterManager.changeRowsPerPage(perPage),
+                    onColumnSortChange: (changedColumn: string, direction: string) =>
+                        filterManager.changeColumnSortChange(changedColumn, direction
+                    )
                 }}
             />
         </MuiThemeProvider>

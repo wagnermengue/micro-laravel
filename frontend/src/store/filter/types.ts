@@ -40,3 +40,5 @@ export interface SetOrderAction extends AnyAction {
         dir: string | null
     }
 }
+
+export type Actions = SetSearchAction | SetPageAction | SetPerPageAction | SetOrderAction;
