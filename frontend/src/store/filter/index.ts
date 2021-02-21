@@ -15,7 +15,7 @@ export const {Types, Creators} = createActions<{
     setPerPage(payload: Typings.SetPerPageAction['payload']): Typings.SetPerPageAction
     setOrder(payload: Typings.SetOrderAction['payload']): Typings.SetOrderAction
     setReset(payload: Typings.SetResetAction['payload']): Typings.SetResetAction
-    updateExtraFilter(payload: Typings.UpdateExtraFilterAction): Typings.UpdateExtraFilterAction
+    updateExtraFilter(payload: Typings.UpdateExtraFilterAction['payload']): Typings.UpdateExtraFilterAction
 }>({
     setSearch: ['payload'],
     setPage: ['payload'],
@@ -101,7 +101,7 @@ function updateExtraFilter(state = INITIAL_STATE, action: UpdateExtraFilterActio
     return {
         ...state,
         extraFilter: {
-            //...state.extraFilter,
+            ...state.extraFilter,
             ...action.payload
         }
     }
