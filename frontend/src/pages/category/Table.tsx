@@ -5,7 +5,7 @@ import parseISO from "date-fns/parseISO";
 import categoryHttp from "../../util/http/category-http";
 import {BadgeNo, BadgeYes} from "../../components/Badge";
 import {Category, ListResponse} from "../../util/models";
-import DefaultTable, {makeActionStyles, TableColumn} from '../../components/Table';
+import DefaultTable, {makeActionStyles, MuiDataTableRefComponent, TableColumn} from '../../components/Table';
 import {useSnackbar} from "notistack";
 import {debounce, IconButton, MuiThemeProvider, Theme} from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
@@ -79,6 +79,7 @@ const Table = () => {
     const subscribed = useRef(true);
     const [data, setData] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
     const {
         columns,
         filterManager,
@@ -91,7 +92,8 @@ const Table = () => {
         columns: columnsDefinition,
         debounceTime: debouncedTime,
         rowsPerPage,
-        rowsPerPageOptions
+        rowsPerPageOptions,
+        tableRef
     });
 
     //component did mount
@@ -146,7 +148,6 @@ const Table = () => {
         }
     }
 
-
     return (
         <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
             <DefaultTable
@@ -155,7 +156,9 @@ const Table = () => {
                 data={data}
                 loading={loading}
                 debouncedSearchTime={debouncedSearchTime}
+                ref={tableRef}
                 options={{
+                    //serverSideFilterList: [[], ['teste'], ['teste'], []],
                     serverSide: true,
                     responsive: "scrollMaxHeight",
                     searchText: filterState.search as any,
@@ -164,7 +167,7 @@ const Table = () => {
                     rowsPerPageOptions,
                     count: totalRecords,
                     customToolbar: () => (
-                        <FilterResetButton handleClick={() => dispatch(Creators.setReset())}/>
+                        <FilterResetButton handleClick={() => filterManager.resetFilter()}/>
                     ),
                     onSearchChange: (value) => filterManager.changeSearch(value),
                     onChangePage: (page) => filterManager.changePage(page),
@@ -176,6 +179,6 @@ const Table = () => {
             />
         </MuiThemeProvider>
     );
-}
+};
 
 export default Table;
