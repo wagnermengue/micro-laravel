@@ -39,7 +39,7 @@ export default function useFilter(options: UseFilterOptions) {
     const INITIAL_STATE = filterManager.getStateFromURL();
     const [totalRecords, setTotalRecords] = useState<number>(0);
     // const [filterState, dispatch] = useReducer<Reducer<FilterState, FilterActions>>(reducer, INITIAL_STATE, init);
-    const [filterState, dispatch] = useReducer(reducer, INITIAL_STATE, init);
+    const [filterState, dispatch] = useReducer<Reducer<FilterState, FilterActions>>(reducer, INITIAL_STATE);
     const [debouncedFilterState] = useDebounce(filterState, options.debounceTime);
 
     filterManager.state = <FilterState>filterState;
@@ -68,7 +68,7 @@ export class FilterManager {
     state: FilterState = null as any;
     debouncedState: FilterState = null as any;
     dispatch: Dispatch<FilterActions> = null as any;
-    columns: ({name: string; options?: MUIDataTableColumnOptions; label?: string; order: { sortDirection: string | null; name: string; options?: MUIDataTableColumnOptions; label?: string } } | MUIDataTableColumn)[];
+    columns: MUIDataTableColumn[];
     rowsPerPage: number;
     rowsPerPageOptions: number[];
     history: History;
