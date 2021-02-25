@@ -38,14 +38,12 @@ export default function useFilter(options: UseFilterOptions) {
     const filterManager = new FilterManager({...options, history});
     const INITIAL_STATE = filterManager.getStateFromURL();
     const [totalRecords, setTotalRecords] = useState<number>(0);
-    // const [filterState, dispatch] = useReducer<Reducer<FilterState, FilterActions>>(reducer, INITIAL_STATE, init);
     const [filterState, dispatch] = useReducer<Reducer<FilterState, FilterActions>>(reducer, INITIAL_STATE);
     const [debouncedFilterState] = useDebounce(filterState, options.debounceTime);
 
     filterManager.state = <FilterState>filterState;
     filterManager.debouncedState = debouncedFilterState;
     filterManager.dispatch = dispatch;
-    filterManager.applyOrderInColumns();
 
     useEffect(() => {
         filterManager.replaceHistory()
@@ -104,7 +102,7 @@ export class FilterManager {
     }
 
     changeColumnSortChange(changedColumn: string, direction: string) {
-        //debugger;
+        debugger;
         this.dispatch(Creators.setOrder({
             sort: changedColumn,
             dir: direction.includes('desc') ? 'desc' : 'asc'
