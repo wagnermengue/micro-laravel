@@ -45,6 +45,8 @@ export default function useFilter(options: UseFilterOptions) {
     filterManager.debouncedState = debouncedFilterState;
     filterManager.dispatch = dispatch;
 
+    filterManager.applyOrderInColumns();
+
     useEffect(() => {
         filterManager.replaceHistory()
     },[]);
@@ -130,10 +132,10 @@ export class FilterManager {
             return column.name === this.state.order.sort
                 ? {
                     ...column,
-                    order: {
-                        ...column,
-                        sortDirection: this.state.order.dir
-                    }
+                    options: {
+                        ...column.options,
+                        sortDirection: this.state.order.dir as any,
+                      },
                 }
                 : column
         });
