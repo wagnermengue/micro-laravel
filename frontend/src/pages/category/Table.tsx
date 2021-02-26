@@ -19,7 +19,8 @@ const columnsDefinition: TableColumn[] = [
         name: 'id',
         label: 'ID',
         options: {
-            sort: false
+            sort: false,
+            filter: false,
         },
         width: '30%',
     },
@@ -27,11 +28,17 @@ const columnsDefinition: TableColumn[] = [
         name: 'name',
         label: 'Nome',
         width: '40%',
+        options: {
+            filter: false
+        }
     },
     {
         name: 'is_active',
         label: 'Ativo?',
         options: {
+            filterOptions: {
+                names: ['Sim', 'Não']
+            },
             customBodyRender(value, tableMeta, updateValue) {
                 return value ? <BadgeYes/> : <BadgeNo/>;
             }
@@ -44,7 +51,8 @@ const columnsDefinition: TableColumn[] = [
         options: {
             customBodyRender(value, tableMeta, updateValue) {
                 return <span>{format(parseISO(value), "dd/MM/yyyy")}</span>;
-            }
+            },
+            filter: false,
         },
         width: '10%',
     },
@@ -117,11 +125,11 @@ const Table = () => {
             const {data} = await categoryHttp.list<ListResponse<Category>>({
                 queryParams: {
                     // filter: filterState.filter,
-                    search: filterManager.cleanSearchText(filterState.search),
-                    page: filterState.pagination.page,
-                    per_page: filterState.pagination.per_page,
-                    sort: filterState.order.sort,
-                    dir: filterState.order.dir,
+                    search: filterManager.cleanSearchText(debouncedFilterState.search),
+                    page: debouncedFilterState.pagination.page,
+                    per_page: debouncedFilterState.pagination.per_page,
+                    sort: debouncedFilterState.order.sort,
+                    dir: debouncedFilterState.order.dir,
                 }
             });
             if (subscribed.current) {
