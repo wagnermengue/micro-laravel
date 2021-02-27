@@ -2,6 +2,8 @@
 
 namespace App\ModelFilters;
 
+use Illuminate\Database\Eloquent\Builder;
+
 class GenreFilter extends DefaultModelFilter
 {
     protected $sortable = ['name', 'is_active', 'created_at'];
@@ -14,10 +16,10 @@ class GenreFilter extends DefaultModelFilter
     public function categories($categories)
     {
         $idsOrNames = explode(',', $categories);
-        $this->whereHas('categories', function(Builder $query) use ($idsOrNames) {
+        return $this->whereHas('categories', function(Builder $query) use ($idsOrNames) {
             $query
                 ->whereIn('id', $idsOrNames)
-                ->orWhere('name', $idsOrNames);
+                ->orWhereIn('name', $idsOrNames);
         });
     }
 }

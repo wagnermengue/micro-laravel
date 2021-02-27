@@ -4,7 +4,7 @@ import {useEffect, useRef, useState} from "react";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import {Chip, IconButton, MuiThemeProvider} from "@material-ui/core";
-import {CastMember, Category, Genre, ListResponse} from "../../util/models";
+import {CastMember, CastMemberTypeMap, Category, Genre, ListResponse} from "../../util/models";
 import DefaultTable, {makeActionStyles, MuiDataTableRefComponent, TableColumn} from "../../components/Table";
 import {Link} from "react-router-dom";
 import EditIcon from "@material-ui/icons/Edit";
@@ -14,6 +14,7 @@ import * as yup from "../../util/vendor/yup";
 import {FilterResetButton} from "../../components/Table/FilterResetButton";
 import genreHttp from "../../util/http/genre-http";
 import categoryHttp from "../../util/http/category-http";
+import {invert} from "lodash";
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -100,7 +101,7 @@ const rowsPerPageOptions = [10, 25, 50];
 const Table = () => {
     const snackbar = useSnackbar();
     const subscribed = useRef(true);
-    const [data, setData] = useState<CastMember[]>([]);
+    const [data, setData] = useState<Genre[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [categories, setCategories] = useState<Category[]>();
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
@@ -191,20 +192,28 @@ const Table = () => {
         filterManager.cleanSearchText(debouncedFilterState.search),
         debouncedFilterState.pagination.page,
         debouncedFilterState.pagination.per_page,
-        debouncedFilterState.order
+        debouncedFilterState.order,
+        JSON.stringify(debouncedFilterState.extraFilter)
     ]);
 
     async function getData() {
         setLoading(true);
         try {
-            const {data} = await genreHttp.list<ListResponse<CastMember>>({
+            const {data} = await genreHttp.list<ListResponse<Genre>>({
                 queryParams: {
                     // filter: filterState.filter,
-                    search: filterManager.cleanSearchText(filterState.search),
-                    page: filterState.pagination.page,
-                    per_page: filterState.pagination.per_page,
-                    sort: filterState.order.sort,
-                    dir: filterState.order.dir,
+                    search: filterManager.cleanSearchText(debouncedFilterState.search),
+                    page: debouncedFilterState.pagination.page,
+                    per_page: debouncedFilterState.pagination.per_page,
+                    sort: debouncedFilterState.order.sort,
+                    dir: debouncedFilterState.order.dir,
+                    ...(
+                        debouncedFilterState.extraFilter &&
+                        debouncedFilterState.extraFilter.categories &&
+                        {
+                            categories: debouncedFilterState.extraFilter.categories.join(',')
+                        }
+                    )
                 }
             });
             if (subscribed.current) {
@@ -234,6 +243,7 @@ const Table = () => {
                 debouncedSearchTime={debouncedSearchTime}
                 ref={tableRef}
                 options={{
+                    serverSideFilterList,
                     serverSide: true,
                     responsive: "scrollMaxHeight",
                     searchText: filterState.search as any,

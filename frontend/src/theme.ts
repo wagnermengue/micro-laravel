@@ -109,12 +109,11 @@ const theme = createMuiTheme({
                 color: (palette!.primary! as SimplePaletteColorOptions).main
             }
         },
-        // diz que nao existe para ser sobrescrito
-        // MUIDataTableFilterList: {
-        //     root: {
-        //         marginBottom: '16px'
-        //     }
-        // },
+        MUIDataTableFilterList: {
+            root: {
+                marginBottom: '16px'
+            }
+        },
     }
 });
 
