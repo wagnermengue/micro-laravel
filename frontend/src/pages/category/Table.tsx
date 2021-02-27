@@ -62,6 +62,7 @@ const columnsDefinition: TableColumn[] = [
         width: '13%',
         options: {
             sort: false,
+            filter: false,
             customBodyRender(value, tableMeta, updateValue): JSX.Element {
                 return (
                     <IconButton

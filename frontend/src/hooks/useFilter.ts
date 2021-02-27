@@ -11,10 +11,6 @@ import * as yup from '../util/vendor/yup';
 import {MuiDataTableRefComponent} from "../components/Table";
 import {debounce} from "@material-ui/core";
 
-function init(INITIAL_STATE) {
-    return INITIAL_STATE;
-}
-
 interface FilterManagerOptions {
     columns: MUIDataTableColumn[];
     rowsPerPage: number;
@@ -104,7 +100,6 @@ export class FilterManager {
     }
 
     changeColumnSortChange(changedColumn: string, direction: string) {
-        debugger;
         this.dispatch(Creators.setOrder({
             sort: changedColumn,
             dir: direction.includes('desc') ? 'desc' : 'asc'
