@@ -17,6 +17,7 @@ import {yupResolver} from "@hookform/resolvers";
 import {useSnackbar} from "notistack";
 import {useHistory, useParams} from "react-router";
 import {CastMember} from "../../util/models";
+import SubmitActions from "../../components/SubmitActions";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -48,13 +49,6 @@ export const Form = () => {
     const {id} = useParams();
     const [castMember, setCastMember] = useState<CastMember>();
     const [loading, setLoading] = useState<boolean>(false);
-
-    const buttonProps : ButtonProps = {
-        className: classes.submit,
-        color: 'secondary',
-        variant: "contained",
-        disabled: loading
-    }
 
     useEffect(() => {
         register({name: "type"})
@@ -120,6 +114,7 @@ export const Form = () => {
                 variant={"outlined"}
                 margin={"normal"}
                 inputRef={register}
+                InputLabelProps={{shrink: true}}
                 disabled={loading}
                 error={errors.name !== undefined}
                 helperText={errors.name && errors.name.settings}
@@ -146,10 +141,10 @@ export const Form = () => {
                         : null
                 }
             </FormControl>
-            <Box dir={"rtl"}>
-                <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
-                <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
-            </Box>
+            <SubmitActions
+                disabledButtons={loading}
+                handleSave={() => onSubmit(getValues(), null)}
+            />
         </form>
     );
 };

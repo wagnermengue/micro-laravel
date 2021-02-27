@@ -57,6 +57,13 @@ const routes = [
         exact: true
     },
     {
+        name: 'cast_members.edit',
+        label: "Editar membros de elencos",
+        path: "/cast-members/:id/edit",
+        component: CastMembersForm,
+        exact: true
+    },
+    {
         name: 'genre.list',
         label: "Listar gêneros",
         path: "/genres",
@@ -69,7 +76,14 @@ const routes = [
         path: "/genres/create",
         component: GenreForm,
         exact: true
-    }
+    },
+    {
+        name: 'genre.edit',
+        label: "Editar gênero",
+        path: "/genres/:id/edit",
+        component: GenreForm,
+        exact: true
+    },
 ];
 
 export default routes;

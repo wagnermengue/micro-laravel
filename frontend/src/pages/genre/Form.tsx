@@ -9,6 +9,7 @@ import {yupResolver} from "@hookform/resolvers";
 import {useSnackbar} from "notistack";
 import {useHistory, useParams} from "react-router";
 import {Category, Genre} from "../../util/models";
+import SubmitActions from "../../components/SubmitActions";
 
 const useStyles = makeStyles((theme: Theme) => {
     return {
@@ -45,14 +46,6 @@ export const Form = () => {
     const [genre, setGenre] = useState<Genre>();
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-
-
-    const buttonProps: ButtonProps = {
-        className: classes.submit,
-        color: 'secondary',
-        variant: "contained",
-        disabled: loading
-    }
 
     useEffect(() => {
         register({name: "categories_id"})
@@ -95,10 +88,6 @@ export const Form = () => {
     }, []);
 
     async function onSubmit(formData, event) {
-        genreHttp
-            .create(formData)
-            .then((response) => console.log(response));
-
         setLoading(true);
         try {
             const http = !genre
@@ -177,10 +166,10 @@ export const Form = () => {
                 inputRef={register}
                 defaultChecked
             /> Ativo?
-            <Box dir={"rtl"}>
-                <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>Salvar</Button>
-                <Button {...buttonProps} type="submit">Salvar e continuar editando</Button>
-            </Box>
+            <SubmitActions
+                disabledButtons={loading}
+                handleSave={() => onSubmit(getValues(), null)}
+            />
         </form>
     );
 };

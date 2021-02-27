@@ -54,14 +54,6 @@ export const Form = () => {
                 setLoading(false)
             }
         })();
-
-        // categoryHttp
-        //     .get(id)
-        //     .then(({data}) => {
-        //         setCategories(data.data)
-        //         reset(data.data)
-        //     })
-        //     .finally(() => setLoading(false));
     }, []);
 
     async function onSubmit(formData, event) {
