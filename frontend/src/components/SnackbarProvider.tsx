@@ -31,6 +31,7 @@ export const SnackbarProvider:React.FC<SnackbarProviderProps> = (props) => {
             vertical: 'top'
         },
         children: undefined,
+        preventDuplicate: true,
         ref: (el) => snackbarProviderRef = el,
         action: (key) => (
             <IconButton

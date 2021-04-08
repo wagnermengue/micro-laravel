@@ -20,6 +20,8 @@ import {DefaultForm} from "../../../components/DefaultForm";
 import videoHttp from "../../../util/http/video-http";
 import RatingField from "./RatingField";
 import UploadField from "./UploadField";
+import AsyncAutocomplete from "../../../components/AsyncAutocomplete";
+import genreHttp from "../../../util/http/genre-http";
 
 const useStyles = makeStyles((theme:Theme) => ({
     cardUpload: {
@@ -142,6 +144,13 @@ export const Form = () => {
         }
     }
 
+    const fetchOptions = (searchText) => genreHttp.list({
+        queryParams: {
+            search: searchText,
+            all: ''
+        }
+    }).then(({data}) => data.data);
+
     return (
         <DefaultForm
             onSubmit={handleSubmit(onSubmit)}
@@ -208,7 +217,16 @@ export const Form = () => {
                     </Grid>
                     Elenco
                     <br/>
-                    Generos e Categorias
+                    <AsyncAutocomplete
+                        fetchOptions={fetchOptions}
+                        AutocompleteProps={{
+                            freeSolo: true,
+                            getOptionLabel: option => option.name
+                        }}
+                        TextFieldProps={{
+                            label: 'Gêneros'
+                        }}
+                    />
                 </Grid>
                 <Grid item xs={12} md={6}>
                     <RatingField

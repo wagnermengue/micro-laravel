@@ -136,9 +136,10 @@ export const Form = () => {
                     <FormControlLabel value="2" control={<Radio/>} label="Ator"/>
                 </RadioGroup>
                 {
-                    errors.type
-                        ? <FormHelperText id="type-helper-text">{errors.type.message}</FormHelperText>
-                        : null
+                    errors.type && <FormHelperText id="type-helper-text">{errors.type.message}</FormHelperText>
+                    //errors.type
+                    //    ? <FormHelperText id="type-helper-text">{errors.type.message}</FormHelperText>
+                    //    : null
                 }
             </FormControl>
             <SubmitActions
