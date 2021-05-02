@@ -86,12 +86,6 @@ const AsyncAutocomplete: React.FC<AsyncAutocompleteProps> = (props) => {
                 if (isSubscribed) {
                     setOptions(data);
                 }
-            } catch (error) {
-                console.error(error);
-                snackbar.enqueueSnackbar(
-                    'Não foi possível carregar as informações',
-                    {variant: 'error'}
-                )
             } finally {
                 setLoading(false);
             }
