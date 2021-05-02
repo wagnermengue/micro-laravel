@@ -11,12 +11,12 @@ const GridSelectedItem: React.FC<GridSelectedItemProps> = (props) => {
     const {onClick, children, ...other} = props;
     return <Grid item {...other}>
         <Grid container alignItems={"center"} spacing={3}>
-            <Grid item xs={1}>
+            <Grid item xs={2}>
                 <IconButton size={"small"} color={"inherit"} onClick={onClick}>
                     <DeleteIcon />
                 </IconButton>
             </Grid>
-            <Grid item xs={10} md={11}>
+            <Grid item xs={10} md={10}>
                 {children}
             </Grid>
         </Grid>
