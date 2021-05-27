@@ -5,18 +5,26 @@ import GridSelectedItem from "../../../components/GridSelectedItem";
 import {Grid, Typography} from "@material-ui/core";
 import useHttpHandle from "../../../hooks/useHttpHandle";
 import categoryHttp from "../../../util/http/category-http";
+import useCollectionManager from "../../../hooks/useCollectionManager";
+import {Genre} from "../../../util/models";
+
 
 interface CategoryFieldsProps {
-
+    categories: any[],
+    setCategories: (categories) => void,
+    genres: Genre[]
 }
 
 const CategoryField: React.FC<CategoryFieldsProps> = (props) => {
+    const {categories, setCategories, genres} = props;
     const autoCompleteHttp = useHttpHandle();
+    const {addItem, removeItem} = useCollectionManager(categories, setCategories);
+
     const fetchOptions = (searchText) => autoCompleteHttp(
         categoryHttp
             .list({
                 queryParams: {
-                    search: searchText,
+                    genres: genres.map(genre => genre.id).join(','),
                     all: ''
                 }})
     ).then(data => data.data);
@@ -26,19 +34,26 @@ const CategoryField: React.FC<CategoryFieldsProps> = (props) => {
             <AsyncAutocomplete
                 fetchOptions={fetchOptions}
                 AutocompleteProps={{
-                    freeSolo: true,
-                    getOptionLabel: option => option.name
+                    getOptionLabel: option => option.name,
+                    onChange: (event, value) => addItem(value),
+                    disabled: !genres.length
                 }}
                 TextFieldProps={{
                     label: 'Categorias'
                 }}
             />
             <GridSelected>
-                <GridSelectedItem onClick={() => {console.log("clicou")} }>
-                    <Typography>
-                        Categoria 1 Categoria 1
-                    </Typography>
-                </GridSelectedItem>
+                {
+                    categories.map((category, key) => (
+                        <GridSelectedItem key={key} onClick={ () => {
+                            console.log("clicou")
+                        }} xs={12}>
+                            <Typography noWrap={true}>
+                                {category.name}
+                            </Typography>
+                        </GridSelectedItem>
+                    ))
+                }
             </GridSelected>
         </>
     );

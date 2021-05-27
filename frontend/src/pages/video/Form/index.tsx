@@ -5,7 +5,7 @@ import {
     TextField,
     Theme,
     FormControlLabel,
-    Grid, Typography, useTheme, useMediaQuery, Card, CardContent
+    Grid, Typography, useTheme, useMediaQuery, Card, CardContent, FormHelperText
 } from "@material-ui/core";
 import {useForm} from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers';
@@ -72,7 +72,8 @@ export const Form = () => {
     } = useForm<any>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
-            genres: []
+            genres: [],
+            categories: []
         }
     });
 
@@ -86,7 +87,7 @@ export const Form = () => {
     const isGreaterMd = useMediaQuery(theme.breakpoints.up('md'));
 
     useEffect(() => {
-        ['rating', 'opened', ...fileFields].forEach(name => register({name}));
+        ['rating', 'opened', 'genres', 'categories', ...fileFields].forEach(name => register({name}));
         // acima a forma de fazer em uma linha o conteudo abaixo
         // const otherFields = ['rating', 'opened'];
         // for (let name of otherFields) {
@@ -226,7 +227,19 @@ export const Form = () => {
                             />
                         </Grid>
                         <Grid item xs={12} md={6}>
-                            <CategoryField />
+                            <CategoryField
+                                categories={watch('categories')}
+                                setCategories={(value) => setValue('categories', value)}
+                                genres={watch('genres')}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <FormHelperText>
+                                Escolha os gêneros dos vídeos
+                            </FormHelperText>
+                            <FormHelperText>
+                                Escola pelo menos uma categoria de cada gênero
+                            </FormHelperText>
                         </Grid>
                     </Grid>
                 </Grid>
