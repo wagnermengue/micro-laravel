@@ -70,7 +70,10 @@ export const Form = () => {
         watch,
         //triggerValidation (ver o porque desse cara)
     } = useForm<any>({
-        resolver: yupResolver(validationSchema)
+        resolver: yupResolver(validationSchema),
+        defaultValues: {
+            genres: []
+        }
     });
 
     const classes = useStyles();
@@ -217,7 +220,10 @@ export const Form = () => {
                     <br/>
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
-                            <GenreField />
+                            <GenreField
+                                genres={watch('genres')}
+                                setGenres={(value) => setValue('genres', value)}
+                            />
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <CategoryField />
