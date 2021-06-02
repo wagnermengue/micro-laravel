@@ -2,18 +2,21 @@ import * as React from 'react';
 import AsyncAutocomplete from "../../../components/AsyncAutocomplete";
 import GridSelected from "../../../components/GridSelected";
 import GridSelectedItem from "../../../components/GridSelectedItem";
-import {Grid, Typography} from "@material-ui/core";
+import {FormControl, Grid, Typography, FormControlProps, FormHelperText} from "@material-ui/core";
 import useHttpHandle from "../../../hooks/useHttpHandle";
 import genreHttp from "../../../util/http/genre-http";
 import useCollectionManager from "../../../hooks/useCollectionManager";
 
 interface GenreFieldsProps {
     genres: any[],
-    setGenres: (genres) => void
+    setGenres: (genres) => void,
+    error: any,
+    disabled?: boolean,
+    FormControlProps?: FormControlProps
 }
 
 const GenreField: React.FC<GenreFieldsProps> = (props) => {
-    const {genres, setGenres} = props;
+    const {genres, setGenres, error, disabled} = props;
     const autoCompleteHttp = useHttpHandle();
     const {addItem, removeItem} = useCollectionManager(genres, setGenres);
     const fetchOptions = (searchText) => autoCompleteHttp(
@@ -30,27 +33,43 @@ const GenreField: React.FC<GenreFieldsProps> = (props) => {
             <AsyncAutocomplete
                 fetchOptions={fetchOptions}
                 AutocompleteProps={{
+                    autoSelect: true,
+                    clearOnEscape: true,
+                    //getOptionSelected: (option, value) => option.id === value.id, (alternativa ao autoSelect)
                     freeSolo: true,
                     getOptionLabel: option => option.name,
-                    onChange: (event, value) => addItem(value)
+                    onChange: (event, value) => addItem(value),
+                    disabled
                 }}
                 TextFieldProps={{
-                    label: 'Gêneros'
+                    label: 'Gêneros',
+                    error: error != undefined
                 }}
             />
-            <GridSelected>
+            <FormControl
+                margin="normal"
+                fullWidth
+                error={error !== undefined}
+                disabled={disabled === true}
+                {...props.FormControlProps}
+            >
+                <GridSelected>
+                    {
+                        genres.map((genre, key) => (
+                            <GridSelectedItem key={key} onClick={ () => {
+                                console.log("clicou")
+                            }} xs={12}>
+                                <Typography noWrap={true}>
+                                    {genre.name}
+                                </Typography>
+                            </GridSelectedItem>
+                        ))
+                    }
+                </GridSelected>
                 {
-                    genres.map((genre, key) => (
-                        <GridSelectedItem key={key} onClick={ () => {
-                            console.log("clicou")
-                        }} xs={12}>
-                            <Typography noWrap={true}>
-                                {genre.name}
-                            </Typography>
-                        </GridSelectedItem>
-                    ))
+                    error && <FormHelperText>{error.message}</FormHelperText>
                 }
-            </GridSelected>
+            </FormControl>
         </>
     );
 };
