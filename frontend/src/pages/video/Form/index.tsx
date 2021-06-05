@@ -230,6 +230,8 @@ export const Form = () => {
                             <GenreField
                                 genres={watch('genres')}
                                 setGenres={(value) => setValue('genres', value)}
+                                categories={watch('categories')}
+                                setCategories={(value) => setValue('categories', value)}
                                 error={errors.genres}
                                 disabled={loading}
                             />

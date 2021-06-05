@@ -14,12 +14,6 @@ class GenreResource extends JsonResource
      */
     public function toArray($request)
     {
-        //@fixme
-        if ($request->route()->uri === "api/genres") {
-            return parent::toArray($request) + [
-                'categories' => CategoryResource::collection($this->categories)
-            ];
-        }
         return parent::toArray($request) + [
             'categories' => CategoryResource::collection($this->whenLoaded('categories'))
         ];
