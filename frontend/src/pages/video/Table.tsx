@@ -34,12 +34,32 @@ const columnsDefinition: TableColumn[] = [
         }
     },
     {
+        name: 'genres',
+        label: 'Gêneros',
+        width: '20%',
+        options: {
+            filter: false,
+            customBodyRender(value, tableMeta, updateValue) {
+                return value.map(value => value.name).join(", ");
+            }
+        }
+    },
+    {
+        name: 'categories',
+        label: 'Categorias',
+        width: '20%',
+        options: {
+            filter: false,
+            customBodyRender(value, tableMeta, updateValue) {
+                return value.map(value => value.name).join(", ");
+            }
+        }
+    },
+    {
         name: 'opened',
         label: 'Publicado?',
         options: {
-            filterOptions: {
-                names: ['Sim', 'Não']
-            },
+            filter: false,
             customBodyRender(value, tableMeta, updateValue) {
                 return value ? <BadgeYes/> : <BadgeNo/>;
             }

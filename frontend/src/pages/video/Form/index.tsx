@@ -12,7 +12,7 @@ import { yupResolver } from '@hookform/resolvers';
 import categoryHttp from "../../../util/http/category-http";
 import * as yup from '../../../util/vendor/yup';
 import {useParams, useHistory} from 'react-router';
-import {useEffect, useState} from "react";
+import {createRef, MutableRefObject, useEffect, useRef, useState} from "react";
 import {useSnackbar} from "notistack";
 import {Category, Video, VideoFileFieldMap} from "../../../util/models";
 import SubmitActions from "../../../components/SubmitActions";
@@ -25,15 +25,25 @@ import genreHttp from "../../../util/http/genre-http";
 import GridSelected from "../../../components/GridSelected";
 import GridSelectedItem from "../../../components/GridSelectedItem";
 import useHttpHandle from "../../../hooks/useHttpHandle";
-import GenreField from "./GenreField";
-import CategoryField from "./CategoryField";
+import GenreField, {GenreFieldComponent} from "./GenreField";
+import CategoryField, {CategoryFieldComponent} from "./CategoryField";
+import CastMemberField, {CastMemberFieldComponent} from "./CastMemberField";
+import {InputFileComponent} from "../../../components/InputFile";
+import {omit, zipObject} from "lodash";
 
 const useStyles = makeStyles((theme:Theme) => ({
     cardUpload: {
         borderRadius: "4px",
         backgroundColor: "#f5f5f5",
         margin: theme.spacing(2,0)
-    }
+    },
+    cardOpened: {
+        borderRadius: "4px",
+        backgroundColor: "#f5f5f5",
+    },
+    cardContentOpened: {
+        paddingBottom: theme.spacing(2) + 'px !important'
+    },
 }));
 
 const validationSchema = yup.object().shape({
@@ -55,6 +65,17 @@ const validationSchema = yup.object().shape({
     genres: yup.array()
         .label('Gêneros')
         .required(),
+        // erro: value Object is of type 'unknown'.
+        // .test({
+        //     message: 'Cada gênero escolhido precisa ter pelo menos uma categoria selecionada',
+        //     test(value){ //array genres [{name, categories: []}]
+        //         return value.every(
+        //             v => v.categories.filter(
+        //                 cat => this.parent.categories.map(c => c.id).includes(cat.id)
+        //             ).length !== 0
+        //         );
+        //     }
+        // }),
     categories: yup.array()
         .label('Categorias')
         .required(),
@@ -74,12 +95,15 @@ export const Form = () => {
         errors,
         reset,
         watch,
-        //triggerValidation (ver o porque desse cara)
+        //triggerValidation // ver porque esse cara causa problema
     } = useForm<any>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
             genres: [],
-            categories: []
+            categories: [],
+            cast_members: [],
+            rating: null,
+            opened: false,
         }
     });
 
@@ -92,8 +116,15 @@ export const Form = () => {
     const theme = useTheme();
     const isGreaterMd = useMediaQuery(theme.breakpoints.up('md'));
 
+    const castMemberRef = useRef() as MutableRefObject<CastMemberFieldComponent>;
+    const genreRef = useRef() as MutableRefObject<GenreFieldComponent>;
+    const categoryRef = useRef() as MutableRefObject<CategoryFieldComponent>;
+    const uploadsRef = useRef(
+        zipObject(fileFields, fileFields.map(() => createRef()))
+    ) as MutableRefObject<{ [key: string]: MutableRefObject<InputFileComponent> }>;
+
     useEffect(() => {
-        ['rating', 'opened', 'genres', 'categories', ...fileFields].forEach(name => register({name}));
+        ['rating', 'opened', 'genres', 'categories', 'cast_members', ...fileFields].forEach(name => register({name}));
         // acima a forma de fazer em uma linha o conteudo abaixo
         // const otherFields = ['rating', 'opened'];
         // for (let name of otherFields) {
@@ -131,15 +162,22 @@ export const Form = () => {
     }, []);
 
     async function onSubmit(formData, event) {
+        const sendData = omit(formData, ['cast_members', 'genres', 'categories']);
+        console.log(sendData);
+        sendData['cast_members_id'] = formData['cast_members'].map(cast_member => cast_member.id);
+        sendData['categories_id'] = formData['categories'].map(category => category.id);
+        sendData['genres_id'] = formData['genres'].map(genre => genre.id);
+
         setLoading(true);
         try {
             const http = !video
-                ? videoHttp.create(formData)
-                : videoHttp.update(video.id, formData)
+                ? videoHttp.create(sendData)
+                : videoHttp.update(video.id, {...sendData, _method: 'PUT'}, {http: {usePost: true}})
             const {data} = await http;
             snackbar.enqueueSnackbar(
                 'Vídeo cadastrado com sucesso!',
                 {variant: "success"});
+            id && resetForm(video);
             setTimeout(() => {
                 event
                     ? (
@@ -157,6 +195,16 @@ export const Form = () => {
         } finally {
             setLoading(false);
         }
+    }
+
+    function resetForm(data) {
+        Object.keys(uploadsRef.current).forEach(
+            field => uploadsRef.current[field].current.clear()
+        );
+        castMemberRef.current.clear();
+        genreRef.current.clear();
+        categoryRef.current.clear();
+        reset(data); //removido se quiser
     }
 
     return (
@@ -223,11 +271,18 @@ export const Form = () => {
                             />
                         </Grid>
                     </Grid>
-                    Elenco
+                    <CastMemberField
+                        ref={castMemberRef}
+                        castMembers={watch('cast_members')}
+                        setCastMembers={(value) => setValue('cast_members', value)}
+                        error={errors.cast_members}
+                        disabled={loading}
+                    />
                     <br/>
                     <Grid container spacing={2}>
                         <Grid item xs={12} md={6}>
                             <GenreField
+                                ref={genreRef}
                                 genres={watch('genres')}
                                 setGenres={(value) => setValue('genres', value)}
                                 categories={watch('categories')}
@@ -238,6 +293,7 @@ export const Form = () => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <CategoryField
+                                ref={categoryRef}
                                 categories={watch('categories')}
                                 setCategories={(value) => setValue('categories', value)}
                                 genres={watch('genres')}
@@ -301,29 +357,34 @@ export const Form = () => {
                         </CardContent>
                     </Card>
                     <br/>
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                name="opened"
-                                color={'primary'}
-                                onChange={() => setValue('opened', !getValues()['opened'])}
-                                checked={watch('opened')}
-                                disabled={loading}
+                    <Card className={classes.cardOpened}>
+                        <CardContent className={classes.cardContentOpened}>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        name="opened"
+                                        color={'primary'}
+                                        onChange={() => setValue('opened', !getValues()['opened'])}
+                                        checked={watch('opened')}
+                                        disabled={loading}
+                                    />
+                                }
+                                label={
+                                    <Typography color={'primary'} variant={'subtitle2'}>
+                                        Quero que este conteúdo apareça na seção lançamentos
+                                    </Typography>
+                                }
+                                labelPlacement={"end"}
                             />
-                        }
-                        label={
-                            <Typography color={'primary'} variant={'subtitle2'}>
-                                Quero que este conteúdo apareça na seção lançamentos
-                            </Typography>
-                        }
-                    />
+                        </CardContent>
+                    </Card>
                 </Grid>
             </Grid>
             <SubmitActions
                 disabledButtons={loading}
                 handleSave={() =>
                     onSubmit(getValues(), null)
-                    //ver o porque desse cara
+                    //ver porque esse cara da problema
                     // triggerValidation().then(isValid => {
                     //     isValid && onSubmit(getValues(), null)
                     // })
