@@ -14,7 +14,7 @@ import * as yup from '../../../util/vendor/yup';
 import {useParams, useHistory} from 'react-router';
 import {createRef, MutableRefObject, useEffect, useRef, useState} from "react";
 import {useSnackbar} from "notistack";
-import {Category, Video, VideoFileFieldMap} from "../../../util/models";
+import {Category, Genre, Video, VideoFileFieldMap} from "../../../util/models";
 import SubmitActions from "../../../components/SubmitActions";
 import {DefaultForm} from "../../../components/DefaultForm";
 import videoHttp from "../../../util/http/video-http";
@@ -64,18 +64,19 @@ const validationSchema = yup.object().shape({
         .label('Duração'),
     genres: yup.array()
         .label('Gêneros')
-        .required(),
-        // erro: value Object is of type 'unknown'.
-        // .test({
-        //     message: 'Cada gênero escolhido precisa ter pelo menos uma categoria selecionada',
-        //     test(value){ //array genres [{name, categories: []}]
-        //         return value.every(
-        //             v => v.categories.filter(
-        //                 cat => this.parent.categories.map(c => c.id).includes(cat.id)
-        //             ).length !== 0
-        //         );
-        //     }
-        // }),
+        .required()
+        //erro: value Object is of type 'unknown'.
+        .test({
+            message: 'Cada gênero escolhido precisa ter pelo menos uma categoria selecionada',
+            test(value){ //array genres [{name, categories: []}]
+                const genres = value as Genre[];
+                return genres.every(
+                    v => v.categories.filter(
+                        cat => this.parent.categories.map(c => c.id).includes(cat.id)
+                    ).length !== 0
+                );
+            }
+        }),
     categories: yup.array()
         .label('Categorias')
         .required(),
@@ -95,7 +96,7 @@ export const Form = () => {
         errors,
         reset,
         watch,
-        //triggerValidation // ver porque esse cara causa problema
+        trigger // ver porque esse cara causa problema
     } = useForm<any>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
@@ -164,7 +165,7 @@ export const Form = () => {
     async function onSubmit(formData, event) {
         const sendData = omit(formData, ['cast_members', 'genres', 'categories']);
         console.log(sendData);
-        sendData['cast_members_id'] = formData['cast_members'].map(cast_member => cast_member.id);
+        sendData['cast_member_id'] = formData['cast_members'].map(cast_member => cast_member.id);
         sendData['categories_id'] = formData['categories'].map(category => category.id);
         sendData['genres_id'] = formData['genres'].map(genre => genre.id);
 
@@ -383,11 +384,11 @@ export const Form = () => {
             <SubmitActions
                 disabledButtons={loading}
                 handleSave={() =>
-                    onSubmit(getValues(), null)
-                    //ver porque esse cara da problema
-                    // triggerValidation().then(isValid => {
-                    //     isValid && onSubmit(getValues(), null)
-                    // })
+                    // onSubmit(getValues(), null),
+                    // ver porque esse cara da problema
+                    trigger().then(isValid => {
+                        isValid && onSubmit(getValues(), null)
+                    })
                 }
             />
         </DefaultForm>
