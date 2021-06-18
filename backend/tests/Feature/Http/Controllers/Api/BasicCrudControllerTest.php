@@ -35,7 +35,7 @@ class BasicCrudControllerTest extends TestCase
     {
         /** @var CategoryStub $category */
         $category = CategoryStub::create(['name' => 'test_name', 'description' => 'test_description']);
-        $resource = $this->controller->index();
+        $resource = $this->controller->index(request());
         $serialized = $resource->response()->getData(true);
         $this->assertEquals([$category->toArray()], $serialized['data']);
         $this->assertArrayHasKey('meta', $serialized);

@@ -41,8 +41,8 @@ export default class HttpResource {
         }
         const {http} = (options || {}) as any;
         return !options || !http || !http.usePost
-            ? this.http.put<T>(`${this.resource}/${id}`, data)
-            : this.http.post<T>(`${this.resource}/${id}`, data);
+            ? this.http.put<T>(`${this.resource}/${id}`, sendData)
+            : this.http.post<T>(`${this.resource}/${id}`, sendData);
     }
 
     delete<T = any>(id): Promise<AxiosResponse<T>> {

@@ -174,7 +174,7 @@ class VideoCrudControllerTest extends BasicVideoControllerTestCase
 
     public function testSaveWithoutFile()
     {
-        $testData = Arr::except($this->sendData, ['categories_id', 'genres_id']);
+        $testData = Arr::except($this->sendData, ['categories_id', 'genres_id', 'cast_members_id']);
         $data = [
             [
                 'send_data' => $this->sendData,

@@ -4,6 +4,7 @@ namespace Tests\Unit\Models;
 
 use App\Models\Genre;
 use App\Traits\Uuid;
+use EloquentFilter\Filterable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use PHPUnit\Framework\TestCase;
 
@@ -45,7 +46,7 @@ class GenreUnitTest extends TestCase
     public function testIfUseTraitsAttribute()
     {
         $traits = [
-            SoftDeletes::class, Uuid::class
+            SoftDeletes::class, Uuid::class, Filterable::class
         ];
         $genreTraits = array_keys(class_uses(Genre::class));
         $this->assertEquals($traits, $genreTraits);
