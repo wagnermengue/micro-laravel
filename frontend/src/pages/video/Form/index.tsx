@@ -30,6 +30,7 @@ import CategoryField, {CategoryFieldComponent} from "./CategoryField";
 import CastMemberField, {CastMemberFieldComponent} from "./CastMemberField";
 import {InputFileComponent} from "../../../components/InputFile";
 import {omit, zipObject} from "lodash";
+import useSnackbarFormError from "../../../hooks/useSnackbarFormError";
 
 const useStyles = makeStyles((theme:Theme) => ({
     cardUpload: {
@@ -96,7 +97,8 @@ export const Form = () => {
         errors,
         reset,
         watch,
-        trigger // ver porque esse cara causa problema
+        trigger,
+        formState
     } = useForm<any>({
         resolver: yupResolver(validationSchema),
         defaultValues: {
@@ -107,6 +109,8 @@ export const Form = () => {
             opened: false,
         }
     });
+
+    useSnackbarFormError(formState.submitCount, errors);
 
     const classes = useStyles();
     const snackbar = useSnackbar();
@@ -384,8 +388,6 @@ export const Form = () => {
             <SubmitActions
                 disabledButtons={loading}
                 handleSave={() =>
-                    // onSubmit(getValues(), null),
-                    // ver porque esse cara da problema
                     trigger().then(isValid => {
                         isValid && onSubmit(getValues(), null)
                     })
