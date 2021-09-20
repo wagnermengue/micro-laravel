@@ -20,7 +20,20 @@ const reducer = createReducer(INITIAL_STATE, {
 export default reducer;
 
 function addUpload(state = INITIAL_STATE, action: Typings.AddUploadAction) : Typings.State {
+    if (!action.payload.files.length) {
+        return state;
+    }
+
+    const index = fileIndexUpload(state, action.payload.video.id);
+    if (index !== -1 && state.uploads[index].progress < 1) {
+        return state;
+    }
+
     return {
 
     };
+}
+
+function fileIndexUpload(state: Typings.State, id: string) {
+    return state.uploads.findIndex((upload) => upload.video.id === id);
 }
