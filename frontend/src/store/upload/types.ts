@@ -1,5 +1,6 @@
 import {AxiosError} from "axios";
 import {Video} from "../../util/models";
+import {AnyAction} from "redux";
 
 export interface FileUpload {
     fileField: string;
@@ -14,6 +15,15 @@ export interface Upload {
     files: FileUpload[];
 }
 
-export interface UploadCollectionState {
+export interface State {
     uploads: Upload[];
 }
+
+export interface AddUploadAction extends AnyAction {
+    payload: {
+        video: Video
+        files: Array<{file: File, FileField:string}>
+    }
+}
+
+export type Actions = AddUploadAction;
