@@ -14,6 +14,8 @@ import {FilterResetButton} from "../../components/Table/FilterResetButton";
 import useFilter from "../../hooks/useFilter";
 import {Creators} from "../../store/filter";
 import videoHttp from "../../util/http/video-http";
+import DeleteDialog from "../../components/DeleteDialog";
+import useDeleteCollection from "../../hooks/useDeleteCollection";
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -109,6 +111,7 @@ const Table = () => {
     const subscribed = useRef(true);
     const [data, setData] = useState<Video[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
+    const {openDeleteDialog, setOpenDeleteDialog, rowsToDelete, setRowsToDelete} = useDeleteCollection();
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
     const {
         columns,
@@ -157,6 +160,9 @@ const Table = () => {
             if (subscribed.current) {
                 setData(data.data);
                 setTotalRecords(data.meta.total);
+                if (openDeleteDialog) {
+                    setOpenDeleteDialog(false)
+                }
                 // setSearchState((prevState => ({
                 //     ...prevState,
                 //     pagination: {
@@ -178,8 +184,44 @@ const Table = () => {
         }
     }
 
+    function deleteRows(confimed: boolean) {
+        if (! confimed) {
+            setOpenDeleteDialog(false);
+            return;
+        }
+        const ids = rowsToDelete
+            .data
+            .map(value => data[value.index].id)
+            .join(',');
+        videoHttp
+            .deleteCollection({ids})
+            .then(reponse => {
+                snackbar.enqueueSnackbar(
+                    'Registros excluidos com sucesso!',
+                    {variant: "success"});
+                //@TODO: When the last page doesn't is full, has a bug
+                if (
+                    rowsToDelete.data.length === filterState.pagination.per_page
+                    && filterState.pagination.page > 1
+                ) {
+                    const page = filterState.pagination.page - 2;
+                    filterManager.changePage(page);
+                } else {
+                    getData();
+                }
+            })
+            .catch((error) => {
+                console.error(error);
+                snackbar.enqueueSnackbar(
+                    'Não foi possível excluir as informações',
+                    {variant: "error"}
+                )
+            })
+    }
+
     return (
         <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
+            <DeleteDialog open={openDeleteDialog} handleClose={deleteRows}/>
             <DefaultTable
                 title="Tabela de vídeos"
                 columns={columns}
@@ -204,7 +246,12 @@ const Table = () => {
                     onChangeRowsPerPage: (perPage) => filterManager.changeRowsPerPage(perPage),
                     onColumnSortChange: (changedColumn: string, direction: string) =>
                         filterManager.changeColumnSortChange(changedColumn, direction
-                    )
+                    ),
+                    onRowsDelete: (rowsDeleted: any[]) => {
+                        console.log(rowsDeleted);
+                        setRowsToDelete(rowsDeleted as any);
+                        return false;
+                    }
                 }}
             />
         </MuiThemeProvider>
