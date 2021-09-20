@@ -22,7 +22,7 @@ export interface State {
 export interface AddUploadAction extends AnyAction {
     payload: {
         video: Video
-        files: Array<{file: File, FileField:string}>
+        files: Array<{file: File, fileField: string}>
     }
 }
 

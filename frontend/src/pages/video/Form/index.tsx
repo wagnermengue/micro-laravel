@@ -32,6 +32,8 @@ import {InputFileComponent} from "../../../components/InputFile";
 import {omit, zipObject} from "lodash";
 import useSnackbarFormError from "../../../hooks/useSnackbarFormError";
 import SnackbarUpload from "../../../components/SnackbarUpload";
+import {useSelector} from "react-redux";
+import {State as UploadState, Upload} from "../../../store/upload/types";
 
 const useStyles = makeStyles((theme:Theme) => ({
     cardUpload: {
@@ -128,6 +130,8 @@ export const Form = () => {
     const uploadsRef = useRef(
         zipObject(fileFields, fileFields.map(() => createRef()))
     ) as MutableRefObject<{ [key: string]: MutableRefObject<InputFileComponent> }>;
+
+    const uploads = useSelector<UploadState, Upload[]>((state) => state.uploads);
 
     useEffect(() => {
         ['rating', 'opened', 'genres', 'categories', 'cast_members', ...fileFields].forEach(name => register({name}));
