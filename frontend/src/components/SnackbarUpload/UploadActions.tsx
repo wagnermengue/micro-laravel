@@ -10,9 +10,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     },
     errorIcon: {
         color: theme.palette.error.main
-    },
-    deleteIcon: {
-        color: theme.palette.primary.main
     }
 }));
 
@@ -39,7 +36,7 @@ const UploadActions: React.FC<UploadActionsProps> = (props) => {
                     }
                 </span>
                 <span>
-                    <IconButton className={classes.deleteIcon} edge={"end"}>
+                    <IconButton color={'primary'} edge={"end"}>
                         <DeleteIcon />
                     </IconButton>
                 </span>
