@@ -1,6 +1,6 @@
 import * as React from 'react';
 import MUIDataTable from "mui-datatables";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import {CastMember, ListResponse, CastMemberTypeMap} from "../../util/models";
@@ -14,6 +14,7 @@ import {FilterResetButton} from "../../components/Table/FilterResetButton";
 import * as yup from '../../util/vendor/yup';
 import castMembersHttp from "../../util/http/castMember-http";
 import {invert} from 'lodash';
+import LoadingContext from "../../components/loading/LoadingContext";
 
 const castMemberNames = Object.values(CastMemberTypeMap);
 
@@ -90,7 +91,7 @@ const Table = () => {
     const snackbar = useSnackbar();
     const subscribed = useRef(true);
     const [data, setData] = useState<CastMember[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const loading = useContext(LoadingContext);
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
     const {
         columns,
@@ -162,7 +163,6 @@ const Table = () => {
     ]);
 
     async function getData() {
-        setLoading(true);
         try {
             const {data} = await castMembersHttp.list<ListResponse<CastMember>>({
                 queryParams: {
@@ -193,8 +193,6 @@ const Table = () => {
             snackbar.enqueueSnackbar(
                 'Não foi possível carregar as informações',
                 {variant: "error"})
-        } finally {
-            setLoading(false)
         }
     }
 

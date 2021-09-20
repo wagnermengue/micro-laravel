@@ -1,6 +1,6 @@
 import * as React from 'react';
 import MUIDataTable from "mui-datatables";
-import {useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import {Chip, IconButton, MuiThemeProvider} from "@material-ui/core";
@@ -15,6 +15,7 @@ import {FilterResetButton} from "../../components/Table/FilterResetButton";
 import genreHttp from "../../util/http/genre-http";
 import categoryHttp from "../../util/http/category-http";
 import {invert} from "lodash";
+import LoadingContext from "../../components/loading/LoadingContext";
 
 const columnsDefinition: TableColumn[] = [
     {
@@ -102,7 +103,7 @@ const Table = () => {
     const snackbar = useSnackbar();
     const subscribed = useRef(true);
     const [data, setData] = useState<Genre[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const loading = useContext(LoadingContext);
     const [categories, setCategories] = useState<Category[]>();
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
     const {
@@ -197,7 +198,6 @@ const Table = () => {
     ]);
 
     async function getData() {
-        setLoading(true);
         try {
             const {data} = await genreHttp.list<ListResponse<Genre>>({
                 queryParams: {
@@ -228,8 +228,6 @@ const Table = () => {
             snackbar.enqueueSnackbar(
                 'Não foi possível carregar as informações',
                 {variant: "error"})
-        } finally {
-            setLoading(false)
         }
     }
 
