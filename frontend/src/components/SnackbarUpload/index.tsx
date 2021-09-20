@@ -6,6 +6,7 @@ import {useSnackbar} from "notistack";
 import {makeStyles} from "@material-ui/core/styles";
 import {useState} from "react";
 import classnames from "classnames";
+import UploadItem from "./UploadItem";
 
 const useStyles = makeStyles((theme: Theme) => ({
     card: {
@@ -35,6 +36,10 @@ const useStyles = makeStyles((theme: Theme) => ({
             duration: theme.transitions.duration.shortest
         })
     },
+    list: {
+        paddingTop: 0,
+        paddingBottom: 0,
+    }
 }));
 
 interface SnackbarUploadProps {
@@ -71,8 +76,8 @@ const SnackbarUpload = React.forwardRef<any, SnackbarUploadProps>((props, ref) =
                 </div>
             </CardActions>
             <Collapse in={expanded}>
-                <List>
-                    Itens
+                <List className={classes.list}>
+                    <UploadItem />
                 </List>
             </Collapse>
         </Card>
