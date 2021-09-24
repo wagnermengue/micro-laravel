@@ -70,8 +70,10 @@ abstract class BasicCrudController extends Controller
     public function update(Request $request, $id)
     {
         $obj = $this->findOrFail($id);
-        $validatedData = $this->validate($request, $this->rulesUpdate());
-        $obj->update($validatedData);
+        $validatedData = $this->validate(
+            $request,
+            $request->isMethod('PUT') ? $this->rulesUpdate() : $this->rulesPatch()
+        );        $obj->update($validatedData);
         $resource = $this->resource();
         return new $resource($obj);
     }
@@ -88,6 +90,21 @@ abstract class BasicCrudController extends Controller
         $data = $this->validateIds($request);
         $this->model()::whereIn('id', $data['ids'])->delete();
         return response()->noContent();
+    }
+
+    protected function rulesPatch()
+    {
+        return array_map(function ($rules) {
+            if (is_array($rules)) {
+                $exists = in_array('required', $rules);
+                if ($exists) {
+                    array_unshift($rules, 'sometimes');
+                }
+            } else {
+                str_replace('required', 'sometimes|required', $rules);
+            }
+            return $rules;
+        }, $this->rulesUpdate());
     }
 
     protected function validateIds(Request $request)
