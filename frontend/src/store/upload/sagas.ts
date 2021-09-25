@@ -50,6 +50,9 @@ function sendUpload({id, fileInfo}: {id: string, fileInfo: FileInfo}) {
             [fileInfo.fileField]: fileInfo.file
         }, {
             config: {
+                headers: {
+                    ignoreLoading: true
+                },
                 onUploadProgress(progressEvent: ProgressEvent) {
                     if (progressEvent.lengthComputable) {
                         const progress = progressEvent.loaded / progressEvent.total;
