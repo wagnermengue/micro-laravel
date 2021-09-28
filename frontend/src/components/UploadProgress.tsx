@@ -2,6 +2,7 @@ import * as React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
 import {CircularProgress, Fade, Theme} from "@material-ui/core";
 import {grey} from "@material-ui/core/colors";
+import {FileUpload, Upload} from "../store/upload/types";
 
 const useStyles = makeStyles((theme: Theme) => ({
     progressContainer: {
@@ -17,14 +18,15 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 interface UploadProgressProps {
-    size: number
-};
+    uploadOrFile: Upload | FileUpload;
+    size: number;
+}
 
 const UploadProgress: React.FC<UploadProgressProps> = (props) => {
-    const {size} = props;
+    const {size, uploadOrFile} = props;
     const classes = useStyles();
     return (
-        <Fade in={true} timeout={{enter: 100, exit: 2000}}>
+        <Fade in={uploadOrFile.progress < 1} timeout={{enter: 100, exit: 2000}}>
             <div className={classes.progressContainer}>
                 <CircularProgress
                     variant={"static"}
@@ -34,7 +36,7 @@ const UploadProgress: React.FC<UploadProgressProps> = (props) => {
                 />
                 <CircularProgress
                     variant={"static"}
-                    value={50}
+                    value={uploadOrFile.progress * 100}
                     className={classes.progress}
                     size={size}
                 />
