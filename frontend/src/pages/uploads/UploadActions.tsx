@@ -9,6 +9,7 @@ import {Link} from "react-router-dom";
 import {FileUpload, Upload} from "../../store/upload/types";
 import {useDispatch} from "react-redux";
 import {Creators} from "../../store/upload";
+import {hasError} from "../../store/upload/getters";
 
 const useStyles = makeStyles((theme: Theme) => ({
     successIcon: {
@@ -34,20 +35,22 @@ const UploadActions: React.FC<UploadActionsProps> = (props) => {
     const {uploadOrFile} = props;
     const classes = useStyles();
     const dispatch = useDispatch();
+    const error = hasError(uploadOrFile);
 
     return (
         <Fade in={true} timeout={{enter: 1000}}>
             <>
                 {
-                    uploadOrFile.progress === 1 && (
-                        <CheckCircleIcon  className={classes.successIcon} />
-                    )
+                    uploadOrFile.progress === 1 &&
+                    !error &&
+                    <CheckCircleIcon  className={classes.successIcon} />
+
                 }
-                <ErrorIcon className={classes.errorIcon} />
+                { error && <ErrorIcon className={classes.errorIcon} /> }
                 <>
                     <Divider className={classes.divider} orientation={'vertical'} />
                     <IconButton
-                        onClick={() => Creators.removeUpload({id: (uploadOrFile as any).video.id})}
+                        onClick={() => dispatch(Creators.removeUpload({id: (uploadOrFile as any).video.id}))}
                     >
                         <DeleteIcon color={'primary'} />
                     </IconButton>

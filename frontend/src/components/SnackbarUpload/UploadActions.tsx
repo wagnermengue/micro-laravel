@@ -6,6 +6,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import {Upload} from "../../store/upload/types";
 import {useDispatch} from "react-redux";
 import {Creators} from "../../store/upload";
+import {hasError} from "../../store/upload/getters";
 
 const useStyles = makeStyles((theme: Theme) => ({
     successIcon: {
@@ -24,22 +25,25 @@ const UploadActions: React.FC<UploadActionsProps> = (props) => {
     const {upload} = props;
     const classes = useStyles();
     const dispatch = useDispatch();
+    const error = hasError(upload);
 
     return (
         <Fade in={true} timeout={{enter: 1000}}>
             <ListItemSecondaryAction>
                 <span>
                     {
-                        upload.progress === 1 && (
+                        upload.progress === 1 && !error && (
                             <IconButton className={classes.successIcon} edge={"end"}>
                                 <CheckCircleIcon />
                             </IconButton>
                         )
                     }
                     {
-                        <IconButton className={classes.errorIcon} edge={"end"}>
-                            <CheckCircleIcon />
-                        </IconButton>
+                        error && (
+                            <IconButton className={classes.errorIcon} edge={"end"}>
+                                <CheckCircleIcon />
+                            </IconButton>
+                        )
                     }
                 </span>
                 <span>
