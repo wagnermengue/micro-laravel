@@ -14,6 +14,8 @@ class Genre extends Model
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     protected $fillable = [
         'name',
         'is_active',

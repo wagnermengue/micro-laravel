@@ -101,7 +101,7 @@ abstract class BasicCrudController extends Controller
                     array_unshift($rules, 'sometimes');
                 }
             } else {
-                str_replace('required', 'sometimes|required', $rules);
+                return str_replace('required', 'sometimes|required', $rules);
             }
             return $rules;
         }, $this->rulesUpdate());

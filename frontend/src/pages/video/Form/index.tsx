@@ -12,7 +12,7 @@ import { yupResolver } from '@hookform/resolvers';
 import categoryHttp from "../../../util/http/category-http";
 import * as yup from '../../../util/vendor/yup';
 import {useParams, useHistory} from 'react-router';
-import {createRef, MutableRefObject, useEffect, useRef, useState} from "react";
+import {createRef, MutableRefObject, useContext, useEffect, useRef, useState} from "react";
 import {useSnackbar} from "notistack";
 import {Category, Genre, Video, VideoFileFieldMap} from "../../../util/models";
 import SubmitActions from "../../../components/SubmitActions";
@@ -35,6 +35,7 @@ import SnackbarUpload from "../../../components/SnackbarUpload";
 import {useDispatch, useSelector} from "react-redux";
 import {UploadState, Upload, UploadModule, FileInfo} from "../../../store/upload/types";
 import {Creators} from "../../../store/upload";
+import LoadingContext from "../../../components/loading/LoadingContext";
 
 const useStyles = makeStyles((theme:Theme) => ({
     cardUpload: {
@@ -122,7 +123,7 @@ export const Form = () => {
     const history = useHistory();
     const {id} = useParams();
     const [video, setVideo] = useState<Video | null>(null);
-    const [loading, setLoading] = useState<boolean>(false);
+    const loading = useContext(LoadingContext);
     const theme = useTheme();
     const isGreaterMd = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -153,7 +154,6 @@ export const Form = () => {
         let isSubscribed = true;
         //iife
         (async () => {
-            setLoading(true);
             try {
                 const {data} = await videoHttp.get(id);
                 if (isSubscribed){
@@ -166,8 +166,6 @@ export const Form = () => {
                 snackbar.enqueueSnackbar(
                 'Não foi possível carregar as informações',
                     {variant: "error"})
-            } finally {
-                setLoading(false)
             }
         })();
         return () => {
@@ -184,7 +182,6 @@ export const Form = () => {
         sendData['categories_id'] = formData['categories'].map(category => category.id);
         sendData['genres_id'] = formData['genres'].map(genre => genre.id);
 
-        setLoading(true);
         try {
             const http = !video
                 ? videoHttp.create(sendData)
@@ -209,8 +206,6 @@ export const Form = () => {
             snackbar.enqueueSnackbar(
                 'Falha ao cadastrar video',
                 {variant: "error"})
-        } finally {
-            setLoading(false);
         }
     }
 
@@ -225,9 +220,13 @@ export const Form = () => {
     }
 
     function uploadFiles(video) {
-        const files : FileInfo[] = fileFields
+        const files: FileInfo[] = fileFields
             .filter(fileField => getValues()[fileField])
-            .map(fileField => ({fileField, file: getValues()[fileField]}));
+            .map(fileField => ({fileField, file: getValues()[fileField] as File}));
+
+        if (!files.length) {
+            return;
+        }
 
         dispatch(Creators.addUpload({video, files}));
 

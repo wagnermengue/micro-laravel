@@ -12,7 +12,7 @@ trait Uuid
     {
         parent::boot();
         static::creating(function ($object) {
-            $object->id = RamseyUuid::uuid4();
+            $object->id = RamseyUuid::uuid4()->toString();
         });
     }
 }

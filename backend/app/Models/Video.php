@@ -26,6 +26,8 @@ class Video extends Model
 
     public $incrementing = false;
 
+    protected $keyType = 'string';
+
     protected $fillable = [
         'title',
         'description',

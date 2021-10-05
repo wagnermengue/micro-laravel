@@ -9,6 +9,7 @@ import {Creators} from "../../store/upload";
 import {hasError, isFinished} from "../../store/upload/getters";
 import {useEffect, useState} from "react";
 import {useDebounce} from "use-debounce";
+import ErrorIcon from "@material-ui/icons/Error";
 
 const useStyles = makeStyles((theme: Theme) => ({
     successIcon: {
@@ -29,8 +30,8 @@ const UploadActions: React.FC<UploadActionsProps> = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const error = hasError(upload);
-    const [debouncedShow] = useDebounce(show, 2500);
     const [show, setShow] = useState(false);
+    const [debouncedShow] = useDebounce(show, 2500);
 
     useEffect(() => {
         setShow(isFinished(upload))
@@ -38,41 +39,38 @@ const UploadActions: React.FC<UploadActionsProps> = (props) => {
 
     return (
         debouncedShow
-            ? (
-                <Fade in={show} timeout={{enter: 1000}}>
+            ? (<Fade in={show} timeout={{enter: 1000}}>
                     <ListItemSecondaryAction>
-                        <span hidden={hover}>
-                            {
-                                upload.progress === 1 && !error && (
-                                    <IconButton className={classes.successIcon} edge={"end"}>
-                                        <CheckCircleIcon />
-                                    </IconButton>
-                                )
-                            }
-                            {
-                                error && (
-                                    <IconButton className={classes.errorIcon} edge={"end"}>
-                                        <CheckCircleIcon />
-                                    </IconButton>
-                                )
-                            }
-                        </span>
-                        <span hidden={!hover}>
-                            <IconButton
-                                color={'primary'}
-                                edge={"end"}
-                                onClick={() => dispatch(Creators.removeUpload(
-                                    {id: upload.video.id}
-                                ))}
-                            >
-                                <DeleteIcon />
+                <span hidden={hover}>
+                    {
+                        upload.progress === 1 && !error && (
+                            <IconButton className={classes.successIcon} edge={"end"}>
+                                <CheckCircleIcon/>
                             </IconButton>
-                        </span>
+                        )
+                    }
+                    {
+                        error && (
+                            <IconButton className={classes.errorIcon} edge={"end"}>
+                                <ErrorIcon/>
+                            </IconButton>
+                        )
+                    }
+                </span>
+                <span hidden={!hover}>
+                    <IconButton
+                        color={'primary'}
+                        edge={"end"}
+                        onClick={() => dispatch(Creators.removeUpload({id: upload.video.id}))}
+                    >
+                        <DeleteIcon/>
+                    </IconButton>
+                </span>
                     </ListItemSecondaryAction>
                 </Fade>
             )
             : null
-    );
+    )
 };
 
 export default UploadActions;
