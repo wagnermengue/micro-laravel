@@ -6,6 +6,7 @@ import UploadProgress from "../UploadProgress";
 import {Upload} from "../../store/upload/types";
 import UploadActions from "./UploadActions";
 import {hasError} from "../../store/upload/getters";
+import {useState} from "react";
 
 const useStyles = makeStyles((theme: Theme) => ({
     listItem: {
@@ -32,6 +33,7 @@ const UploadItem: React.FC<UploadItemProps> = (props) => {
     const {upload} = props;
     const classes = useStyles();
     const error = hasError(upload);
+    const [itemHover, setItemHover] = useState(false);
 
     return (
         <>
@@ -46,6 +48,8 @@ const UploadItem: React.FC<UploadItemProps> = (props) => {
                 <ListItem
                     className={classes.listItem}
                     button
+                    onMouseOver={() => setItemHover(true)}
+                    onMouseLeave={() => setItemHover(false)}
                 >
                     <ListItemIcon className={classes.movieIcon}>
                         <MovieIcon/>
@@ -59,7 +63,7 @@ const UploadItem: React.FC<UploadItemProps> = (props) => {
                         }
                     />
                     <UploadProgress uploadOrFile={upload} size={30}/>
-                    <UploadActions upload={upload}/>
+                    <UploadActions upload={upload} hover={itemHover}/>
                 </ListItem>
             </Tooltip>
             <Divider component="li" />
