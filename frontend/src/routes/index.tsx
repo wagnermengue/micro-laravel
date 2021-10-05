@@ -111,7 +111,7 @@ const routes = [
     {
         name: 'uploads',
         label: "Uploads",
-        path: "/uploads/",
+        path: "/uploads",
         component: UploadPage,
         exact: true
     },

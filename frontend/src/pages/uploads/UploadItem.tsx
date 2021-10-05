@@ -3,7 +3,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Divider, Grid, ListItem, ListItemIcon, ListItemText, Theme, Tooltip, Typography} from "@material-ui/core";
 import MovieIcon from "@material-ui/icons/Movie";
 import ImageIcon from "@material-ui/icons/Image";
-import UploadActions from "./UploadActions";
+import UploadAction from "./UploadActions";
 import UploadProgress from "../../components/UploadProgress";
 import {FileUpload, Upload} from "../../store/upload/types";
 
@@ -56,7 +56,7 @@ const UploadItem: React.FC<UploadItemProps> = (props) => {
                         justify={"flex-end"}
                     >
                         <UploadProgress size={48} uploadOrFile={uploadOrFile}/>
-                        <UploadActions uploadOrFile={uploadOrFile}/>
+                        <UploadAction uploadOrFile={uploadOrFile}/>
                     </Grid>
                 </Grid>
             </Grid>

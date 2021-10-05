@@ -4,7 +4,7 @@ import {AnyAction} from "redux";
 
 export interface FileUpload {
     fileField: string;
-    fileName: string;
+    filename: string;
     progress: number;
     error?: AxiosError;
 }

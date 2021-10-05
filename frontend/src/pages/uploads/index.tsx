@@ -38,7 +38,7 @@ const Upload = () => {
         <Page title={'Uploads'}>
             {
                 uploads.map((upload, key) => (
-                    <Card elevation={5}>
+                    <Card elevation={5} key={key}>
                         <CardContent>
                             <UploadItem uploadOrFile={upload}>
                                 {upload.video.title}
@@ -46,7 +46,7 @@ const Upload = () => {
                             <ExpansionPanel style={{margin: 0}}>
                                 <ExpansionPanelSummary
                                     className={classes.panelSummary}
-                                    expandIcon={<ExpandMoreIcon className={classes.expandedIcon} />}
+                                    expandIcon={<ExpandMoreIcon className={classes.expandedIcon}/>}
                                 >
                                     <Typography>Ver detalhes</Typography>
                                 </ExpansionPanelSummary>
@@ -56,9 +56,9 @@ const Upload = () => {
                                             {
                                                 upload.files.map((file, key) => (
                                                     <React.Fragment key={key}>
-                                                        <Divider />
+                                                        <Divider/>
                                                         <UploadItem uploadOrFile={file}>
-                                                            {`${VideoFileFieldMap[file.fileField]} - ${file.fileName}`}
+                                                            {`${VideoFileFieldMap[file.fileField]} - ${file.filename}`}
                                                         </UploadItem>
                                                     </React.Fragment>
                                                 ))
