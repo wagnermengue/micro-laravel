@@ -12,7 +12,7 @@ import { yupResolver } from '@hookform/resolvers';
 import categoryHttp from "../../../util/http/category-http";
 import * as yup from '../../../util/vendor/yup';
 import {useParams, useHistory} from 'react-router';
-import {createRef, MutableRefObject, useContext, useEffect, useRef, useState} from "react";
+import {createRef, MutableRefObject, useCallback, useContext, useEffect, useRef, useState} from "react";
 import {useSnackbar} from "notistack";
 import {Category, Genre, Video, VideoFileFieldMap} from "../../../util/models";
 import SubmitActions from "../../../components/SubmitActions";
@@ -118,7 +118,7 @@ export const Form = () => {
     useSnackbarFormError(formState.submitCount, errors);
 
     const classes = useStyles();
-    const snackbar = useSnackbar();
+    const {enqueueSnackbar} = useSnackbar();
     const dispatch = useDispatch();
     const history = useHistory();
     const {id} = useParams();
@@ -137,6 +137,16 @@ export const Form = () => {
     const uploads = useSelector<UploadModule, Upload[]>(
         (state) => state.upload.uploads
     );
+
+    const resetForm = useCallback((data) => {
+        Object.keys(uploadsRef.current).forEach(
+            field => uploadsRef.current[field].current.clear()
+        );
+        castMemberRef.current.clear();
+        genreRef.current.clear();
+        categoryRef.current.clear();
+        reset(data); //removido se quiser
+    }, [uploadsRef, castMemberRef, genreRef, categoryRef, reset]);
 
     useEffect(() => {
         ['rating', 'opened', 'genres', 'categories', 'cast_members', ...fileFields].forEach(name => register({name}));
@@ -158,12 +168,12 @@ export const Form = () => {
                 const {data} = await videoHttp.get(id);
                 if (isSubscribed){
                     setVideo(data.data);
-                    reset(data.data);
+                    resetForm(data.data); //ver se nao vai dar problema antes era reset
                 }
 
             } catch (error) {
                 console.log(error);
-                snackbar.enqueueSnackbar(
+                enqueueSnackbar(
                 'Não foi possível carregar as informações',
                     {variant: "error"})
             }
@@ -171,7 +181,7 @@ export const Form = () => {
         return () => {
             isSubscribed = false;
         }
-    }, []);
+    }, [id, resetForm, enqueueSnackbar]);
 
     async function onSubmit(formData, event) {
         const sendData = omit(
@@ -187,7 +197,7 @@ export const Form = () => {
                 ? videoHttp.create(sendData)
                 : videoHttp.update(video.id, sendData)
             const {data} = await http;
-            snackbar.enqueueSnackbar(
+            enqueueSnackbar(
                 'Vídeo cadastrado com sucesso!',
                 {variant: "success"});
             uploadFiles(data.data);
@@ -203,20 +213,10 @@ export const Form = () => {
             });
         } catch (error) {
             console.log(error);
-            snackbar.enqueueSnackbar(
+            enqueueSnackbar(
                 'Falha ao cadastrar video',
                 {variant: "error"})
         }
-    }
-
-    function resetForm(data) {
-        Object.keys(uploadsRef.current).forEach(
-            field => uploadsRef.current[field].current.clear()
-        );
-        castMemberRef.current.clear();
-        genreRef.current.clear();
-        categoryRef.current.clear();
-        reset(data); //removido se quiser
     }
 
     function uploadFiles(video) {
@@ -230,7 +230,7 @@ export const Form = () => {
 
         dispatch(Creators.addUpload({video, files}));
 
-        snackbar.enqueueSnackbar('', {
+        enqueueSnackbar('', {
             key: 'snackbar-upload',
             persist: true,
             anchorOrigin: {

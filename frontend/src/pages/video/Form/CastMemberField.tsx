@@ -7,7 +7,7 @@ import useHttpHandle from "../../../hooks/useHttpHandle";
 import genreHttp from "../../../util/http/genre-http";
 import useCollectionManager from "../../../hooks/useCollectionManager";
 import {getGenresFromCategory} from "../../../util/models-filters";
-import {MutableRefObject, RefAttributes, useImperativeHandle, useRef} from "react";
+import {MutableRefObject, RefAttributes, useCallback, useImperativeHandle, useRef} from "react";
 import castMembersHttp from "../../../util/http/castMember-http";
 
 interface CastMemberFieldProps extends RefAttributes<CastMemberFieldProps>{
@@ -28,14 +28,16 @@ const CastMemberField = React.forwardRef<CastMemberFieldComponent, CastMemberFie
     const {addItem, removeItem} = useCollectionManager(castMembers, setCastMembers);
     const autoCompleteRef = useRef() as MutableRefObject<AsyncAutocompleteComponent>;
 
-    const fetchOptions = (searchText) => autoCompleteHttp(
-        castMembersHttp
-            .list({
-                queryParams: {
-                    search: searchText,
-                    all: ''
-                }})
-    ).then(data => data.data);
+    const fetchOptions = useCallback((searchText) => {
+        return autoCompleteHttp(
+            castMembersHttp
+                .list({
+                    queryParams: {
+                        search: searchText,
+                        all: ''
+                    }})
+        ).then(data => data.data);
+    }, [autoCompleteHttp]);
 
     useImperativeHandle(ref, () => ({
         clear: () => autoCompleteRef.current.clear()

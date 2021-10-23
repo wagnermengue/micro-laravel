@@ -40,7 +40,7 @@ export const Form = () => {
     });
 
     const classes = useStyles();
-    const snackbar = useSnackbar();
+    const {enqueueSnackbar} = useSnackbar();
     const history = useHistory();
     const {id} = useParams();
     const [genre, setGenre] = useState<Genre>();
@@ -74,7 +74,7 @@ export const Form = () => {
                 }
             } catch (error) {
                 console.log(error);
-                snackbar.enqueueSnackbar(
+                enqueueSnackbar(
                     'Não foi possível carregar as informações',
                     {variant: "error"})
             } finally {
@@ -85,7 +85,7 @@ export const Form = () => {
         return () => {
             isSubscribe = false;
         }
-    }, []);
+    }, [id, reset, enqueueSnackbar]);
 
     async function onSubmit(formData, event) {
         setLoading(true);
@@ -94,7 +94,7 @@ export const Form = () => {
                 ? genreHttp.create(formData)
                 : genreHttp.update(genre.id, formData)
             const {data} = await http;
-            snackbar.enqueueSnackbar(
+            enqueueSnackbar(
                 'Gênero cadastrado com sucesso!',
                 {variant: "success"});
             setTimeout(() => {
@@ -108,7 +108,7 @@ export const Form = () => {
             });
         } catch (error) {
             console.log(error);
-            snackbar.enqueueSnackbar(
+            enqueueSnackbar(
                 'Falha ao cadastrar gênero',
                 {variant: "error"})
         } finally {
