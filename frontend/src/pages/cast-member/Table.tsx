@@ -1,6 +1,5 @@
 import * as React from 'react';
-import MUIDataTable from "mui-datatables";
-import {useContext, useEffect, useMemo, useRef, useState} from "react";
+import {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import {CastMember, ListResponse, CastMemberTypeMap} from "../../util/models";
@@ -88,7 +87,7 @@ const rowsPerPage = 10;
 const rowsPerPageOptions = [10, 25, 50];
 
 const Table = () => {
-    const snackbar = useSnackbar();
+    const {enqueueSnackbar} = useSnackbar();
     const subscribed = useRef(true);
     const [data, setData] = useState<CastMember[]>([]);
     const loading = useContext(LoadingContext);
@@ -137,6 +136,7 @@ const Table = () => {
         extraFilter
     });
 
+    const searchText = cleanSearchText(debouncedFilterState.search);
     const indexColumnType = columns.findIndex(c => c.name === 'type');
     const columnType = columns[indexColumnType];
     const typeFilterValue = filterState.extraFilter && filterState.extraFilter.type as never;
@@ -147,36 +147,17 @@ const Table = () => {
         serverSideFilterList[indexColumnType] = [typeFilterValue];
     }
 
-    //component did mount
-    useEffect(() => {
-        subscribed.current = true; //evita memory leak
-        getData();
-        return () => {
-            subscribed.current = false;
-        }
-    }, [
-        cleanSearchText(debouncedFilterState.search),
-        debouncedFilterState.pagination.page,
-        debouncedFilterState.pagination.per_page,
-        debouncedFilterState.order,
-        JSON.stringify(debouncedFilterState.extraFilter)
-    ]);
-
-    async function getData() {
+    const getData = useCallback(async ({search, page, per_page, sort, dir, type}) => {
         try {
             const {data} = await castMembersHttp.list<ListResponse<CastMember>>({
                 queryParams: {
-                    // filter: filterState.filter,
-                    search: cleanSearchText(debouncedFilterState.search),
-                    page: debouncedFilterState.pagination.page,
-                    per_page: debouncedFilterState.pagination.per_page,
-                    sort: debouncedFilterState.order.sort,
-                    dir: debouncedFilterState.order.dir,
-                    ...(
-                        debouncedFilterState.extraFilter &&
-                        debouncedFilterState.extraFilter.type &&
-                        {
-                            type: invert(CastMemberTypeMap)[debouncedFilterState.extraFilter.type]
+                    search,
+                    page,
+                    per_page,
+                    sort,
+                    dir,
+                    ...(type && {
+                            type: invert(CastMemberTypeMap)[type]
                         }
                     )
                 }
@@ -190,11 +171,40 @@ const Table = () => {
             if (castMembersHttp.isCanceledRequest(error)) {
                 return;
             }
-            snackbar.enqueueSnackbar(
+            enqueueSnackbar(
                 'Não foi possível carregar as informações',
                 {variant: "error"})
         }
-    }
+    }, [setTotalRecords, enqueueSnackbar]);
+
+    //component did mount
+    useEffect(() => {
+        subscribed.current = true; //evita memory leak
+        getData({
+            search: searchText,
+            page: debouncedFilterState.pagination.page,
+            per_page: debouncedFilterState.pagination.per_page,
+            sort: debouncedFilterState.order.sort,
+            dir: debouncedFilterState.order.dir,
+            ...(
+                debouncedFilterState.extraFilter &&
+                debouncedFilterState.extraFilter.type &&
+                {
+                    type: debouncedFilterState.extraFilter.type
+                }
+            )
+        });
+        return () => {
+            subscribed.current = false;
+        }
+    }, [
+        getData,
+        searchText,
+        debouncedFilterState.pagination.page,
+        debouncedFilterState.pagination.per_page,
+        debouncedFilterState.order,
+        debouncedFilterState.extraFilter
+    ]);
 
     return (
         <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
