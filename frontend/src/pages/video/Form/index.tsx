@@ -26,8 +26,8 @@ import {InputFileComponent} from "../../../components/InputFile";
 import {omit, zipObject} from "lodash";
 import useSnackbarFormError from "../../../hooks/useSnackbarFormError";
 import SnackbarUpload from "../../../components/SnackbarUpload";
-import {useDispatch} from "react-redux";
-import {FileInfo} from "../../../store/upload/types";
+import {useDispatch, useSelector} from "react-redux";
+import {FileInfo, Upload, UploadModule} from "../../../store/upload/types";
 import {Creators} from "../../../store/upload";
 import LoadingContext from "../../../components/loading/LoadingContext";
 
@@ -128,11 +128,6 @@ export const Form = () => {
         zipObject(fileFields, fileFields.map(() => createRef()))
     ) as MutableRefObject<{ [key: string]: MutableRefObject<InputFileComponent> }>;
 
-    // @TODO: ver porque essa const nao foi usada
-    // const uploads = useSelector<UploadModule, Upload[]>(
-    //     (state) => state.upload.uploads
-    // );
-
     const resetForm = useCallback((data) => {
         Object.keys(uploadsRef.current).forEach(
             field => uploadsRef.current[field].current.clear()
@@ -161,9 +156,11 @@ export const Form = () => {
         (async () => {
             try {
                 const {data} = await videoHttp.get(id);
+                console.log(data);
                 if (isSubscribed){
                     setVideo(data.data);
-                    resetForm(data.data); //ver se nao vai dar problema antes era reset
+                    // resetForm(data.data); tive que colocar reset senao nao estava carregando
+                    reset(data.data); //ver se nao vai dar problema antes era reset
                 }
 
             } catch (error) {
