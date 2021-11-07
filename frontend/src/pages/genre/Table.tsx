@@ -109,6 +109,7 @@ const Table = () => {
     const {
         columns,
         filterManager,
+        cleanSearchText,
         filterState,
         debouncedFilterState,
         dispatch,
@@ -184,13 +185,12 @@ const Table = () => {
     //component did mount
     useEffect(() => {
         subscribed.current = true; //evita memory leak
-        filterManager.pushHistory();
         getData();
         return () => {
             subscribed.current = false;
         }
     }, [
-        filterManager.cleanSearchText(debouncedFilterState.search),
+        cleanSearchText(debouncedFilterState.search),
         debouncedFilterState.pagination.page,
         debouncedFilterState.pagination.per_page,
         debouncedFilterState.order,
@@ -202,7 +202,7 @@ const Table = () => {
             const {data} = await genreHttp.list<ListResponse<Genre>>({
                 queryParams: {
                     // filter: filterState.filter,
-                    search: filterManager.cleanSearchText(debouncedFilterState.search),
+                    search: cleanSearchText(debouncedFilterState.search),
                     page: debouncedFilterState.pagination.page,
                     per_page: debouncedFilterState.pagination.per_page,
                     sort: debouncedFilterState.order.sort,
