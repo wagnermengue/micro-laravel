@@ -1,6 +1,6 @@
 import * as React from 'react';
 import MUIDataTable from "mui-datatables";
-import {useContext, useEffect, useRef, useState} from "react";
+import {useContext, useEffect, useMemo, useRef, useState} from "react";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import {CastMember, ListResponse, CastMemberTypeMap} from "../../util/models";
@@ -93,13 +93,39 @@ const Table = () => {
     const [data, setData] = useState<CastMember[]>([]);
     const loading = useContext(LoadingContext);
     const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
+    const extraFilter = useMemo(() => ({
+        createValidationSchema: () => {
+            return yup.object().shape({
+                type: yup.string()
+                    .nullable()
+                    .transform(value => {
+                        return !value || !castMemberNames.includes(value) ? undefined : value;
+                    })
+                    .default(null)
+            })
+        },
+        formatSearchParams: (debouncedState) => {
+            return debouncedState.extraFilter
+                ? {
+                    ...(
+                        debouncedState.extraFilter.type &&
+                        {type: debouncedState.extraFilter.type}
+                    )
+                }
+                : undefined
+        },
+        getStateFromUrl: (queryParams) => {
+            return {
+                type: queryParams.get('type')
+            }
+        }
+    }), []);
     const {
         columns,
         filterManager,
         cleanSearchText,
         filterState,
         debouncedFilterState,
-        dispatch,
         totalRecords,
         setTotalRecords
     } = useFilter({
@@ -108,33 +134,7 @@ const Table = () => {
         rowsPerPage,
         rowsPerPageOptions,
         tableRef,
-        extraFilter: {
-            createValidationSchema: () => {
-                return yup.object().shape({
-                    type: yup.string()
-                        .nullable()
-                        .transform(value => {
-                            return !value || !castMemberNames.includes(value) ? undefined : value;
-                        })
-                        .default(null)
-                })
-            },
-            formatSearchParams: (debouncedState) => {
-                return debouncedState.extraFilter
-                    ? {
-                        ...(
-                            debouncedState.extraFilter.type &&
-                            {type: debouncedState.extraFilter.type}
-                        )
-                    }
-                    : undefined
-            },
-            getStateFromUrl: (queryParams) => {
-                return {
-                    type: queryParams.get('type')
-                }
-            }
-        }
+        extraFilter
     });
 
     const indexColumnType = columns.findIndex(c => c.name === 'type');

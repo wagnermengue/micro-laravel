@@ -96,7 +96,6 @@ const Table = () => {
         cleanSearchText,
         filterState,
         debouncedFilterState,
-        dispatch,
         totalRecords,
         setTotalRecords
     } = useFilter({

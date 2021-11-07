@@ -4,7 +4,6 @@ import {Actions as FilterActions, State as FilterState} from "../store/filter/ty
 import {MUIDataTableColumn} from "mui-datatables";
 import {useDebounce} from "use-debounce";
 import {useHistory} from "react-router";
-import {History} from "history";
 import {isEqual} from 'lodash';
 import * as yup from '../util/vendor/yup';
 import {MuiDataTableRefComponent} from "../components/Table";
@@ -15,11 +14,9 @@ interface FilterManagerOptions {
     schema: ObjectSchema
     columns: MUIDataTableColumn[];
     rowsPerPage: number;
-    rowsPerPageOptions: number[];
-    debounceTime: number;
-    history: History;
-    tableRef: React.MutableRefObject<MuiDataTableRefComponent>
-    extraFilter?: ExtraFilter
+    tableRef: React.MutableRefObject<MuiDataTableRefComponent>;
+    dispatch: Dispatch<FilterActions>;
+    state: FilterState;
 }
 
 interface ExtraFilter {
@@ -126,12 +123,12 @@ export default function useFilter(options: UseFilterOptions) {
         }
     }, [cleanSearchText]);
 
-    const filterManager = new FilterManager({...options, history, schema});
     const INITIAL_STATE = stateFromURL;
-    const [totalRecords, setTotalRecords] = useState<number>(0);
     // tive que colocar INITIAL_STATE as any pois o <FilterState> no useMemo do stateFromURL e no schema nao funcionaram
     const [filterState, dispatch] = useReducer<Reducer<FilterState, FilterActions>>(reducer, INITIAL_STATE as any);
+    const filterManager = new FilterManager({...options, state: filterState, dispatch, schema});
     const [debouncedFilterState] = useDebounce(filterState, options.debounceTime);
+    const [totalRecords, setTotalRecords] = useState<number>(0);
 
     useEffect(() => {
         history.replace({
@@ -159,8 +156,6 @@ export default function useFilter(options: UseFilterOptions) {
     }, [history, locationPathname, formatSearchParams, debouncedFilterState, extraFilter, cleanSearchText, locationState]);
 
     filterManager.state = filterState as FilterState;
-    filterManager.debouncedState = debouncedFilterState;
-    filterManager.dispatch = dispatch;
 
     filterManager.applyOrderInColumns();
 
@@ -183,25 +178,22 @@ export default function useFilter(options: UseFilterOptions) {
 export class FilterManager {
 
     schema;
-    state: FilterState = null as any;
-    debouncedState: FilterState = null as any;
-    dispatch: Dispatch<FilterActions> = null as any;
+    state: FilterState;
+    dispatch: Dispatch<FilterActions>;
     columns: MUIDataTableColumn[];
     rowsPerPage: number;
-    rowsPerPageOptions: number[];
-    history: History;
     tableRef: React.MutableRefObject<MuiDataTableRefComponent>;
-    extraFilter?: ExtraFilter;
 
-    constructor(options: FilterManagerOptions) {
-        const {schema, columns, rowsPerPage, rowsPerPageOptions, history, tableRef, extraFilter} = options;
+    //@TODO: tive que deixar sem o time porque nao tava indo, remover depois que finalizar
+    //constructor(options: FilterManagerOptions) {
+    constructor(options) {
+        const {schema, columns, rowsPerPage, tableRef, dispatch, state} = options;
         this.schema = schema;
         this.columns = columns;
         this.rowsPerPage = rowsPerPage;
-        this.rowsPerPageOptions = rowsPerPageOptions;
-        this.history = history;
         this.tableRef = tableRef;
-        this.extraFilter = extraFilter;
+        this.dispatch = dispatch;
+        this.state = state;
     }
 
     private resetTablePagination() {
