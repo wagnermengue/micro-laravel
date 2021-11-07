@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useContext, useEffect, useReducer, useRef, useState} from "react";
+import {useCallback, useContext, useEffect, useRef, useState} from "react";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import categoryHttp from "../../util/http/category-http";
@@ -7,12 +7,11 @@ import {BadgeNo, BadgeYes} from "../../components/Badge";
 import {Category, ListResponse} from "../../util/models";
 import DefaultTable, {makeActionStyles, MuiDataTableRefComponent, TableColumn} from '../../components/Table';
 import {useSnackbar} from "notistack";
-import {debounce, IconButton, MuiThemeProvider, Theme} from "@material-ui/core";
+import {IconButton, MuiThemeProvider} from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import {Link} from "react-router-dom";
 import {FilterResetButton} from "../../components/Table/FilterResetButton";
 import useFilter from "../../hooks/useFilter";
-import {Creators} from "../../store/filter";
 import LoadingContext from "../../components/loading/LoadingContext";
 
 const columnsDefinition: TableColumn[] = [
@@ -85,7 +84,7 @@ const rowsPerPage = 10;
 const rowsPerPageOptions = [10, 25, 50];
 
 const Table = () => {
-    const snackbar = useSnackbar();
+    const {enqueueSnackbar} = useSnackbar();
     const subscribed = useRef(true);
     const [data, setData] = useState<Category[]>([]);
     const loading = useContext(LoadingContext);
@@ -106,53 +105,54 @@ const Table = () => {
         tableRef
     });
 
-    //component did mount
-    useEffect(() => {
-        subscribed.current = true; //evita memory leak
-        getData();
-        return () => {
-            subscribed.current = false;
-        }
-    }, [
-        cleanSearchText(debouncedFilterState.search),
-        debouncedFilterState.pagination.page,
-        debouncedFilterState.pagination.per_page,
-        debouncedFilterState.order
-    ]);
+    const searchText = cleanSearchText(debouncedFilterState.search);
 
-    async function getData() {
+    const getData = useCallback(async ({search, page, per_page, sort, dir}) => {
         try {
             const {data} = await categoryHttp.list<ListResponse<Category>>({
                 queryParams: {
-                    // filter: filterState.filter,
-                    search: cleanSearchText(debouncedFilterState.search),
-                    page: debouncedFilterState.pagination.page,
-                    per_page: debouncedFilterState.pagination.per_page,
-                    sort: debouncedFilterState.order.sort,
-                    dir: debouncedFilterState.order.dir,
+                    search,
+                    page,
+                    per_page,
+                    sort,
+                    dir,
                 }
             });
             if (subscribed.current) {
                 setData(data.data);
                 setTotalRecords(data.meta.total);
-                // setSearchState((prevState => ({
-                //     ...prevState,
-                //     pagination: {
-                //         ...prevState.pagination,
-                //         total: data.meta.total
-                //     }
-                // })))
             }
         } catch (error) {
             console.log(error);
             if (categoryHttp.isCanceledRequest(error)) {
                 return;
             }
-            snackbar.enqueueSnackbar(
+            enqueueSnackbar(
                 'Não foi possível carregar as informações',
                 {variant: "error"})
         }
-    }
+    }, [setTotalRecords, enqueueSnackbar]);
+
+    //component did mount
+    useEffect(() => {
+        subscribed.current = true; //evita memory leak
+        getData({
+            search: searchText,
+            page: debouncedFilterState.pagination.page,
+            per_page: debouncedFilterState.pagination.per_page,
+            sort: debouncedFilterState.order.sort,
+            dir: debouncedFilterState.order.dir,
+        });
+        return () => {
+            subscribed.current = false;
+        }
+    }, [
+        getData,
+        searchText,
+        debouncedFilterState.pagination.page,
+        debouncedFilterState.pagination.per_page,
+        debouncedFilterState.order
+    ]);
 
     return (
         <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
