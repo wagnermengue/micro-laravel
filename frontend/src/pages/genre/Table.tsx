@@ -1,10 +1,9 @@
 import * as React from 'react';
-import MUIDataTable from "mui-datatables";
-import {useContext, useEffect, useMemo, useRef, useState} from "react";
+import {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import {Chip, IconButton, MuiThemeProvider} from "@material-ui/core";
-import {CastMember, CastMemberTypeMap, Category, Genre, ListResponse} from "../../util/models";
+import {Category, Genre, ListResponse} from "../../util/models";
 import DefaultTable, {makeActionStyles, MuiDataTableRefComponent, TableColumn} from "../../components/Table";
 import {Link} from "react-router-dom";
 import EditIcon from "@material-ui/icons/Edit";
@@ -14,7 +13,6 @@ import * as yup from "../../util/vendor/yup";
 import {FilterResetButton} from "../../components/Table/FilterResetButton";
 import genreHttp from "../../util/http/genre-http";
 import categoryHttp from "../../util/http/category-http";
-import {invert} from "lodash";
 import LoadingContext from "../../components/loading/LoadingContext";
 
 const columnsDefinition: TableColumn[] = [
@@ -100,7 +98,7 @@ const rowsPerPage = 10;
 const rowsPerPageOptions = [10, 25, 50];
 
 const Table = () => {
-    const snackbar = useSnackbar();
+    const {enqueueSnackbar} = useSnackbar();
     const subscribed = useRef(true);
     const [data, setData] = useState<Genre[]>([]);
     const loading = useContext(LoadingContext);
@@ -150,6 +148,7 @@ const Table = () => {
         extraFilter
     });
 
+    const searchText = cleanSearchText(debouncedFilterState.search);
     const indexColumnCategories = columns.findIndex(c => c.name === 'categories');
     const columnCategories = columns[indexColumnCategories];
     const categoriesFilterValue = filterState.extraFilter && filterState.extraFilter.categories;
@@ -170,7 +169,7 @@ const Table = () => {
                 }
             } catch (error) {
                 console.error(error);
-                snackbar.enqueueSnackbar(
+                enqueueSnackbar(
                     'Não foi possível carregar as informações',
                     {variant: 'error',}
                 )
@@ -180,34 +179,18 @@ const Table = () => {
         return () => {
             isSubscrible = false;
         }
-    }, []);
+    }, [enqueueSnackbar]);
 
-    //component did mount
-    useEffect(() => {
-        subscribed.current = true; //evita memory leak
-        getData();
-        return () => {
-            subscribed.current = false;
-        }
-    }, [
-        cleanSearchText(debouncedFilterState.search),
-        debouncedFilterState.pagination.page,
-        debouncedFilterState.pagination.per_page,
-        debouncedFilterState.order,
-        JSON.stringify(debouncedFilterState.extraFilter)
-    ]);
-
-    async function getData() {
+    const getData = useCallback(async ({search, page, per_page, sort, dir, type}) => {
         try {
             const {data} = await genreHttp.list<ListResponse<Genre>>({
                 queryParams: {
-                    // filter: filterState.filter,
-                    search: cleanSearchText(debouncedFilterState.search),
-                    page: debouncedFilterState.pagination.page,
-                    per_page: debouncedFilterState.pagination.per_page,
-                    sort: debouncedFilterState.order.sort,
-                    dir: debouncedFilterState.order.dir,
-                    ...(
+                    search,
+                    page,
+                    per_page,
+                    sort,
+                    dir,
+                    ...(type &&
                         debouncedFilterState.extraFilter &&
                         debouncedFilterState.extraFilter.categories &&
                         {
@@ -225,11 +208,39 @@ const Table = () => {
             if (genreHttp.isCanceledRequest(error)) {
                 return;
             }
-            snackbar.enqueueSnackbar(
+            enqueueSnackbar(
                 'Não foi possível carregar as informações',
                 {variant: "error"})
         }
-    }
+    }, [enqueueSnackbar]);
+
+    //component did mount
+    useEffect(() => {
+        subscribed.current = true; //evita memory leak
+        getData({
+            search: searchText,
+            page: debouncedFilterState.pagination.page,
+            per_page: debouncedFilterState.pagination.per_page,
+            sort: debouncedFilterState.order.sort,
+            dir: debouncedFilterState.order.dir,
+            ...(
+                debouncedFilterState.extraFilter &&
+                debouncedFilterState.extraFilter.categories &&
+                {
+                    categories: debouncedFilterState.extraFilter.categories.join(',')
+                }
+            )
+        });
+        return () => {
+            subscribed.current = false;
+        }
+    }, [
+        searchText,
+        debouncedFilterState.pagination.page,
+        debouncedFilterState.pagination.per_page,
+        debouncedFilterState.order,
+        debouncedFilterState.extraFilter
+    ]);
 
     return (
         <MuiThemeProvider theme={makeActionStyles(columnsDefinition.length - 1)}>
