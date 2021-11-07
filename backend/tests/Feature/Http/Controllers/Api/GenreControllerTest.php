@@ -112,22 +112,50 @@ class GenreControllerTest extends TestCase
         $this->assertInvalidationInUpdateAction($data, 'exists');
     }
 
-    public function testStore()
+    public function testSave()
     {
         $categoryId = factory(Category::class)->create()->id;
-        $data = ['name' => 'test'];
-        $response = $this->assertStore($data + ['categories_id' => [$categoryId]], $data + ['is_active' => true]);
-        $response->assertJsonStructure(['data' => $this->serializedFields]);
-
-        $this->assertHasCategory($response->json('data.id'), $categoryId);
 
         $data = [
-            'name' => 'test',
-            'is_active' => false
+            [
+                'send_data' => [
+                    'name' => 'test',
+                    'categories_id' => [$categoryId]
+                ],
+                'test_data' => [
+                    'name' => 'test',
+                    'is_active' => true
+                ]
+            ],
+            [
+                'send_data' => [
+                    'name' => 'test',
+                    'is_active' => false,
+                    'categories_id' => [$categoryId]
+                ],
+                'test_data' => [
+                    'name' => 'test',
+                    'is_active' => false
+                ]
+            ]
         ];
-        $response = $this->assertStore($data + ['categories_id' => [$categoryId]], $data + ['is_active' => true]);
 
-        $this->assertResource($response, new GenreResource(Genre::find($response->json('data.id'))));
+        foreach ($data as $test) {
+            $response = $this->assertStore($test['send_data'], $test['test_data']);
+            $response->assertJsonStructure([
+                'data' => $this->serializedFields
+            ]);
+            $this->assertResource($response, new GenreResource(
+                Genre::find($response->json('data.id'))
+            ));
+            $response = $this->assertUpdate($test['send_data'], $test['test_data']);
+            $response->assertJsonStructure([
+                'data' => $this->serializedFields
+            ]);
+            $this->assertResource($response, new GenreResource(
+                Genre::find($response->json('data.id'))
+            ));
+        }
     }
 
     public function testUpdate()
@@ -218,7 +246,7 @@ class GenreControllerTest extends TestCase
 
         $hasError = false;
         try {
-            $controller->update($request, 1);
+            $controller->store($request);
         } catch (TestException $exception) {
             $this->assertCount(1, Genre::all());
             $hasError = true;

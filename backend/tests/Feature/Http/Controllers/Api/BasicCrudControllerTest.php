@@ -107,6 +107,10 @@ class BasicCrudControllerTest extends TestCase
             ->shouldReceive('all')
             ->once()
             ->andReturn(['name' => 'test_name_crud_changed', 'description' => 'test_description_crud_changed']);
+        $request
+            ->shouldReceive('isMethod')
+            ->once()
+            ->andReturn('put');
         $resource = $this->controller->update($request, $category->id);
         $serialized = $resource->response()->getData(true);
         $category->refresh();

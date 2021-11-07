@@ -51,6 +51,16 @@ class VideoCrudControllerTest extends BasicVideoControllerTestCase
                 'updated_at',
                 'deleted_at',
             ]
+        ],
+        'cast_members' => [
+            '*' => [
+                'id',
+                'name',
+                'type',
+                'created_at',
+                'updated_at',
+                'deleted_at',
+            ]
         ]
     ];
 

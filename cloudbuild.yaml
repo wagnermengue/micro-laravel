@@ -29,24 +29,44 @@ steps:
 
   - id: 'Rodando compose'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root', '-w', '/var/www/backend','micro-videos-app', 'composer', 'install']
+    args: ['exec', '-t', 'app', 'composer', 'install', '-d', '/var/www/backend']
 
   - id: 'Copiando .env'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', 'cp', './backend/.env.example', './backend/.env']
+    args: ['exec', '-t', 'app', 'cp', './backend/.env.example', './backend/.env']
 
   - id: 'Copiando .env.testing'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', 'cp', './backend/.env.testing.example', './backend/.env']
+    args: ['exec', '-t', 'app', 'cp', './backend/.env.testing.example', './backend/.env.testing']
 
   - id: 'Rodando key:generate'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', 'php', '/var/www/backend/artisan', 'key:generate']
+    args: ['exec', '-t', 'app', 'php', '/var/www/backend/artisan', 'key:generate']
 
   - id: 'Rodando migrations'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', 'php', '/var/www/backend/artisan', 'migrate']
+    args: ['exec', '-t', 'app', 'php', '/var/www/backend/artisan', 'migrate']
 
   - id: 'Rodando tests'
     name: 'gcr.io/cloud-builders/docker'
-    args: ['exec', '-t', '-u' ,'root' ,'micro-videos-app', 'php', '/var/www/backend/vendor/bin/phpunit', '-c', '/var/www/backend/phpunit.xml']
+    args: ['exec', '-t', 'app', 'php', '/var/www/backend/vendor/bin/phpunit', '-c', '/var/www/backend/phpunit.xml']
+
+  - id: 'Copiando frontend .env'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['exec', '-t', 'app', 'cp', '/var/www/frontend/.env.example', '/var/www/frontend/.env']
+
+  - id: 'Install front-end'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['exec', '-t', 'app', 'npm', 'install', '--prefix', '/var/www/frontend']
+
+  - id: 'Permission on scripts/build.sh'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['exec', '-t', 'app', 'chmod', '+x', '/var/www/frontend/scripts/build.sh']
+
+  - id: 'Build front-end'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['exec','-t','app','npm','run', 'build-laravel','--prefix', '/var/www/frontend']
+
+  - id: 'Test Laravel and React integration'
+    name: 'gcr.io/cloud-builders/docker'
+    args: ['exec', '-w', '/var/www/backend', '-t', 'app', 'php', 'artisan', 'dusk', '--env=testing']

@@ -12,6 +12,9 @@ fi
 if [ ! -f ".env.testing" ]; then
 cp .env.testing.example .env.testing
 fi
+if [ ! -f ".env.dusk" ]; then
+cp .env.dusk.example .env.dusk.testing
+fi
 composer install
 php artisan key:generate
 php artisan key:generate --env=testing
