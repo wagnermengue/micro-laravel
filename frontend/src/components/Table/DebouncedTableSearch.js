@@ -86,7 +86,7 @@ class DebouncedTableSearch extends React.PureComponent {
     };
 
     render() {
-        const { classes, options, onHide, searchText } = this.props;
+        const { classes, options, onHide } = this.props;
         let value = this.state.text;
 
         return (

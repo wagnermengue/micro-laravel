@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Box, Button, Checkbox, ButtonProps, makeStyles, TextField, Theme, FormControlLabel} from "@material-ui/core";
+import {Checkbox, TextField, FormControlLabel} from "@material-ui/core";
 import {useForm} from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers';
 import categoryHttp from "../../util/http/category-http";
@@ -54,7 +54,7 @@ export const Form = () => {
                 setLoading(false)
             }
         })();
-    }, []);
+    }, [id, reset, snackbar]);
 
     async function onSubmit(formData, event) {
         setLoading(true);

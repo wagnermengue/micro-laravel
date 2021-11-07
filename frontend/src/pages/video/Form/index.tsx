@@ -5,26 +5,20 @@ import {
     TextField,
     Theme,
     FormControlLabel,
-    Grid, Typography, useTheme, useMediaQuery, Card, CardContent, FormHelperText
+    Grid, Typography, useTheme, useMediaQuery, Card, CardContent
 } from "@material-ui/core";
 import {useForm} from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers';
-import categoryHttp from "../../../util/http/category-http";
 import * as yup from '../../../util/vendor/yup';
 import {useParams, useHistory} from 'react-router';
 import {createRef, MutableRefObject, useCallback, useContext, useEffect, useRef, useState} from "react";
 import {useSnackbar} from "notistack";
-import {Category, Genre, Video, VideoFileFieldMap} from "../../../util/models";
+import {Genre, Video, VideoFileFieldMap} from "../../../util/models";
 import SubmitActions from "../../../components/SubmitActions";
 import {DefaultForm} from "../../../components/DefaultForm";
 import videoHttp from "../../../util/http/video-http";
 import RatingField from "./RatingField";
 import UploadField from "./UploadField";
-import AsyncAutocomplete from "../../../components/AsyncAutocomplete";
-import genreHttp from "../../../util/http/genre-http";
-import GridSelected from "../../../components/GridSelected";
-import GridSelectedItem from "../../../components/GridSelectedItem";
-import useHttpHandle from "../../../hooks/useHttpHandle";
 import GenreField, {GenreFieldComponent} from "./GenreField";
 import CategoryField, {CategoryFieldComponent} from "./CategoryField";
 import CastMemberField, {CastMemberFieldComponent} from "./CastMemberField";
@@ -32,8 +26,8 @@ import {InputFileComponent} from "../../../components/InputFile";
 import {omit, zipObject} from "lodash";
 import useSnackbarFormError from "../../../hooks/useSnackbarFormError";
 import SnackbarUpload from "../../../components/SnackbarUpload";
-import {useDispatch, useSelector} from "react-redux";
-import {UploadState, Upload, UploadModule, FileInfo} from "../../../store/upload/types";
+import {useDispatch} from "react-redux";
+import {FileInfo} from "../../../store/upload/types";
 import {Creators} from "../../../store/upload";
 import LoadingContext from "../../../components/loading/LoadingContext";
 
@@ -134,9 +128,10 @@ export const Form = () => {
         zipObject(fileFields, fileFields.map(() => createRef()))
     ) as MutableRefObject<{ [key: string]: MutableRefObject<InputFileComponent> }>;
 
-    const uploads = useSelector<UploadModule, Upload[]>(
-        (state) => state.upload.uploads
-    );
+    // @TODO: ver porque essa const nao foi usada
+    // const uploads = useSelector<UploadModule, Upload[]>(
+    //     (state) => state.upload.uploads
+    // );
 
     const resetForm = useCallback((data) => {
         Object.keys(uploadsRef.current).forEach(

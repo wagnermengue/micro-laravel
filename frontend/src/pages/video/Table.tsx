@@ -175,7 +175,6 @@ const Table = () => {
     }, [
         getData,
         searchText,
-        cleanSearchText(debouncedFilterState.search),
         debouncedFilterState.pagination.page,
         debouncedFilterState.pagination.per_page,
         debouncedFilterState.order

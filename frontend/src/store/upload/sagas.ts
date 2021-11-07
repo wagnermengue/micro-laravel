@@ -4,7 +4,6 @@ import {actionChannel, take, call, put, select} from "redux-saga/effects";
 import {AddUploadAction, FileInfo} from "./types";
 import {Video} from "../../util/models";
 import videoHttp from "../../util/http/video-http";
-import {Simulate} from "react-dom/test-utils";
 
 export function* uploadWhatcherSaga() {
     const newFilesChannel = yield actionChannel(Types.ADD_UPLOAD);

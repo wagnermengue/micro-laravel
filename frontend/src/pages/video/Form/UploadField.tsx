@@ -8,7 +8,6 @@ import {
 import InputFile, {InputFileComponent} from "../../../components/InputFile";
 import CloudUploadFile from "@material-ui/icons/CloudUpload";
 import {MutableRefObject, useImperativeHandle, useRef} from "react";
-import {ref} from "yup";
 
 interface UploadFieldProps {
     accept: string,

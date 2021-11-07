@@ -2,7 +2,7 @@ import * as React from 'react';
 import AsyncAutocomplete, {AsyncAutocompleteComponent} from "../../../components/AsyncAutocomplete";
 import GridSelected from "../../../components/GridSelected";
 import GridSelectedItem from "../../../components/GridSelectedItem";
-import {FormHelperText, Grid, Typography, FormControlProps, FormControl, makeStyles, Theme} from "@material-ui/core";
+import {FormHelperText, Typography, FormControlProps, FormControl, makeStyles, Theme} from "@material-ui/core";
 import useHttpHandle from "../../../hooks/useHttpHandle";
 import categoryHttp from "../../../util/http/category-http";
 import useCollectionManager from "../../../hooks/useCollectionManager";
@@ -63,7 +63,7 @@ const CategoryField = React.forwardRef<CategoryFieldComponent, CategoryFieldsPro
                 }}
                 TextFieldProps={{
                     label: 'Categorias',
-                    error: error != undefined
+                    error: error !== undefined
                 }}
             />
             <FormHelperText style={{height: '24px'}}>

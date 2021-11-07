@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {makeStyles} from "@material-ui/core/styles";
-import {Divider, Grid, ListItem, ListItemIcon, ListItemText, Theme, Tooltip, Typography} from "@material-ui/core";
+import {Grid, ListItem, Theme, Typography} from "@material-ui/core";
 import MovieIcon from "@material-ui/icons/Movie";
 import ImageIcon from "@material-ui/icons/Image";
 import UploadAction from "./UploadActions";

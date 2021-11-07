@@ -2,7 +2,7 @@ import * as React from 'react';
 import AsyncAutocomplete, {AsyncAutocompleteComponent} from "../../../components/AsyncAutocomplete";
 import GridSelected from "../../../components/GridSelected";
 import GridSelectedItem from "../../../components/GridSelectedItem";
-import {FormControl, Grid, Typography, FormControlProps, FormHelperText} from "@material-ui/core";
+import {FormControl, Typography, FormControlProps, FormHelperText} from "@material-ui/core";
 import useHttpHandle from "../../../hooks/useHttpHandle";
 import genreHttp from "../../../util/http/genre-http";
 import useCollectionManager from "../../../hooks/useCollectionManager";
@@ -59,7 +59,7 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldsProps>((prop
                 }}
                 TextFieldProps={{
                     label: 'Gêneros',
-                    error: error != undefined
+                    error: error !== undefined
                 }}
             />
             <FormHelperText style={{height: '24px'}}>
@@ -81,7 +81,7 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldsProps>((prop
                                     const categoriesWithOneGenre = categories
                                         .filter(category => {
                                             const genresFromCategory = getGenresFromCategory(genres, category);
-                                            return genresFromCategory.length === 1 && genresFromCategory[0].id == genre.id;
+                                            return genresFromCategory.length === 1 && genresFromCategory[0].id === genre.id;
                                         })
                                     categoriesWithOneGenre.forEach(cat => removeCategory(cat));
                                     removeItem(genre)

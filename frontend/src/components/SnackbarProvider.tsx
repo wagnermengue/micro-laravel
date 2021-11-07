@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {SnackbarProvider as NotifySnackbarProvider, SnackbarProviderProps, WithSnackbarProps} from "notistack";
+import {SnackbarProvider as NotifySnackbarProvider, SnackbarProviderProps} from "notistack";
 import {IconButton, makeStyles} from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import theme from "../theme";

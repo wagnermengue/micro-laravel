@@ -2,11 +2,9 @@ import * as React from 'react';
 import AsyncAutocomplete, {AsyncAutocompleteComponent} from "../../../components/AsyncAutocomplete";
 import GridSelected from "../../../components/GridSelected";
 import GridSelectedItem from "../../../components/GridSelectedItem";
-import {FormControl, Grid, Typography, FormControlProps, FormHelperText} from "@material-ui/core";
+import {FormControl, Typography, FormControlProps, FormHelperText} from "@material-ui/core";
 import useHttpHandle from "../../../hooks/useHttpHandle";
-import genreHttp from "../../../util/http/genre-http";
 import useCollectionManager from "../../../hooks/useCollectionManager";
-import {getGenresFromCategory} from "../../../util/models-filters";
 import {MutableRefObject, RefAttributes, useCallback, useImperativeHandle, useRef} from "react";
 import castMembersHttp from "../../../util/http/castMember-http";
 
@@ -58,7 +56,7 @@ const CastMemberField = React.forwardRef<CastMemberFieldComponent, CastMemberFie
                 }}
                 TextFieldProps={{
                     label: 'Elenco',
-                    error: error != undefined
+                    error: error !== undefined
                 }}
             />
             <FormControl

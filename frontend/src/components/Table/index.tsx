@@ -4,7 +4,6 @@ import {merge, omit, cloneDeep} from 'lodash';
 import {MuiThemeProvider, Theme, useMediaQuery, useTheme} from "@material-ui/core";
 import DebouncedTableSearch from "./DebouncedTableSearch";
 import {RefAttributes} from "react";
-import {ref} from "yup";
 
 const makeDefaultOptions = (debouncedSearchTime): MUIDataTableOptions => ({
     print: false,

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Divider, Fade, IconButton, ListItemSecondaryAction, Theme} from "@material-ui/core";
+import {Divider, Fade, IconButton, Theme} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import ErrorIcon from "@material-ui/icons/Error";
 import DeleteIcon from "@material-ui/icons/Delete";

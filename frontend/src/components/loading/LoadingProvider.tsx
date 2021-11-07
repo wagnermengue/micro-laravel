@@ -1,6 +1,5 @@
 import * as React from 'react';
 import LoadingContext from "./LoadingContext";
-import axios from "axios";
 import {useEffect, useMemo, useState} from "react";
 import {
     addGlobalRequestInterceptor,

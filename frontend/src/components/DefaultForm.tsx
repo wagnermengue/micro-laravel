@@ -1,6 +1,6 @@
 // @flow 
 import * as React from 'react';
-import {Grid, GridProps, makeStyles, Theme} from "@material-ui/core";
+import {Grid, GridProps, makeStyles} from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
         gridItem: {

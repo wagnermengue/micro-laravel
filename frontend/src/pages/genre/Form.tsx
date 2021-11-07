@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Box, Button, Checkbox, ButtonProps, makeStyles, TextField, Theme, MenuItem} from "@material-ui/core";
+import {Checkbox, TextField, MenuItem} from "@material-ui/core";
 import {useForm} from "react-hook-form";
 import genreHttp from "../../util/http/genre-http";
 import categoryHttp from "../../util/http/category-http";
@@ -10,14 +10,6 @@ import {useSnackbar} from "notistack";
 import {useHistory, useParams} from "react-router";
 import {Category, Genre} from "../../util/models";
 import SubmitActions from "../../components/SubmitActions";
-
-const useStyles = makeStyles((theme: Theme) => {
-    return {
-        submit: {
-            margin: theme.spacing(1)
-        }
-    }
-});
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -39,7 +31,6 @@ export const Form = () => {
         }
     });
 
-    const classes = useStyles();
     const {enqueueSnackbar} = useSnackbar();
     const history = useHistory();
     const {id} = useParams();

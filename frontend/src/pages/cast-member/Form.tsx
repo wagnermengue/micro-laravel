@@ -1,11 +1,6 @@
 import * as React from 'react';
 import {
-    Box,
-    Button,
-    ButtonProps,
-    makeStyles,
     TextField,
-    Theme,
     FormControl,
     FormLabel, RadioGroup, FormControlLabel, Radio, FormHelperText
 } from "@material-ui/core";
@@ -18,14 +13,6 @@ import {useSnackbar} from "notistack";
 import {useHistory, useParams} from "react-router";
 import {CastMember} from "../../util/models";
 import SubmitActions from "../../components/SubmitActions";
-
-const useStyles = makeStyles((theme: Theme) => {
-    return {
-        submit: {
-            margin: theme.spacing(1)
-        }
-    }
-});
 
 const validationSchema = yup.object().shape({
     name: yup.string()
@@ -43,7 +30,6 @@ export const Form = () => {
         resolver: yupResolver(validationSchema),
     });
 
-    const classes = useStyles();
     const snackbar = useSnackbar();
     const history = useHistory();
     const {id} = useParams();
@@ -74,7 +60,7 @@ export const Form = () => {
                 setLoading(false)
             }
         })();
-    }, []);
+    }, [id, reset, snackbar]);
 
     async function onSubmit(formData, event) {
         setLoading(true);

@@ -48,7 +48,7 @@ function addUpload(state = INITIAL_STATE, action: Typings.AddUploadAction) : Typ
             $splice: [[index, 1]]
         })
 
-    return <Typings.UploadState>{
+    return {
         uploads: [
             ...uploads,
             {
@@ -61,7 +61,7 @@ function addUpload(state = INITIAL_STATE, action: Typings.AddUploadAction) : Typ
                 }))
             }
         ]
-    };
+    } as Typings.UploadState;
 }
 
 function removeUpload(state: Typings.UploadState = INITIAL_STATE, action: Typings.RemoveUploadAction): Typings.UploadState {
