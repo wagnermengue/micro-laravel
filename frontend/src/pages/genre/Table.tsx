@@ -179,7 +179,7 @@ const Table = () => {
         return () => {
             isSubscrible = false;
         }
-    }, [enqueueSnackbar]);
+    }, [columnCategories, enqueueSnackbar]);
 
     const getData = useCallback(async ({search, page, per_page, sort, dir, type}) => {
         try {
@@ -212,7 +212,7 @@ const Table = () => {
                 'Não foi possível carregar as informações',
                 {variant: "error"})
         }
-    }, [enqueueSnackbar]);
+    }, [debouncedFilterState, setTotalRecords, enqueueSnackbar]);
 
     //component did mount
     useEffect(() => {
@@ -235,6 +235,7 @@ const Table = () => {
             subscribed.current = false;
         }
     }, [
+        getData,
         searchText,
         debouncedFilterState.pagination.page,
         debouncedFilterState.pagination.per_page,
