@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
+        "bschmitt/laravel-amqp": "2.0.10",
         "fideloper/proxy": "^4.0",
         "fruitcake/laravel-cors": "^2.0",
         "laravel/framework": "^6.0",

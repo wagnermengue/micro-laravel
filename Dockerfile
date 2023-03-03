@@ -14,7 +14,7 @@ RUN apk add --no-cache shadow \
 RUN touch /root/.bashrc | echo "PS1='\w\$ '" >> /root/.bashrc
 RUN touch /home/www-data/.bashrc | echo "PS1='\w\$ '" >> /home/www-data/.bashrc
 
-RUN docker-php-ext-install pdo pdo_mysql zip
+RUN docker-php-ext-install pdo pdo_mysql zip bcmath sockets
 RUN docker-php-ext-configure gd --with-gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ --with-png-dir=/usr/include/
 RUN docker-php-ext-install -j$(nproc) gd
 
